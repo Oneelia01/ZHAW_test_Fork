@@ -228,7 +228,13 @@
 }
 \NewDocumentCommand{\thesistype}{m}{\newcommand{\ttype}{#1}}
 \NewDocumentCommand{\thesisdate}{m}{\newcommand{\tdate}{#1}}
-\DeclareDocumentCommand{\author}{m}{\newcommand{\authorname}{#1}\renewcommand{\@author}{#1}}
+%\DeclareDocumentCommand{\authorA}{m}{\newcommand{\authornameA}{#1}\renewcommand{\@authorA}{#1}}
+%\DeclareDocumentCommand{\authorB}{m}{\newcommand{\authornameB}{#1}\renewcommand{\@authorB}{#1}}
+%\DeclareDocumentCommand{\authorC}{m}{\newcommand{\authornameC}{#1}\renewcommand{\@authorC}{#1}}
+\NewDocumentCommand{\authorA}{m}{\newcommand{\autnameA}{#1}}
+\NewDocumentCommand{\authorB}{m}{\newcommand{\autnameB}{#1}}
+\NewDocumentCommand{\authorC}{m}{\newcommand{\autnameC}{#1}}
+\NewDocumentCommand{\authorS}{m}{\newcommand{\autnameS}{#1}}
 \NewDocumentCommand{\supervisorA}{m}{\newcommand{\supnameA}{#1}}
 \NewDocumentCommand{\supervisorAmail}{m}{\newcommand{\supmailA}{#1}}
 \NewDocumentCommand{\supervisorAweb}{m}{\newcommand{\supwebA}{#1}}
@@ -381,8 +387,8 @@ KOMA-script documentation for details.}]{fancyhdr}
 %   ABBREVIATIONS PAGE DESIGN
 %----------------------------------------------------------------------------------------
 
-\newcommand{\abbrevname}{List of Abbreviations}
-\providecaptionname{english,british,american}{\abbrevname}{List of Abbreviations}
+\newcommand{\abbrevname}{Liste der Abkürzungen}
+\providecaptionname{english,british,american}{\abbrevname}{Liste der Abkürzungen}
 \providecaptionname{ngerman,german,austrian,naustrian}{\abbrevname}{Abk\"urzungsverzeichnis}
 \NewDocumentEnvironment{abbreviations}{ m }{%
     \ifbool{nolistspace}{\begingroup\singlespacing}{}
@@ -402,10 +408,15 @@ KOMA-script documentation for details.}]{fancyhdr}
 \DeclareDocumentCommand{\abstracttitlefont}{}{}
 \newcommand{\byname}{by}
 \newcommand{\vonname}{von}
-\newcommand{\abstractname}{Abstract}
-\newcommand{\extraabstractname}{Zusammenfassung}
+\newcommand{\abstractname}{}
+\newcommand{\extraabstractname}{}
 \providecaptionname{german,ngerman,austrian,naustrian}{\byname}{von}
 \providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish}{\byname}{by}
+\providecaptionname{german,ngerman,austrian,naustrian}{\abstractname}{Abstract}
+\providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish}{\abstractname}{Abstract}
+\providecaptionname{german,ngerman,austrian,naustrian}{\extraabstractname}{Zusammenfassung}
+\providecaptionname{american,australian,british,canadian,english,newzealand,UKenglish,USenglish}{\extraabstractname}{Zusammenfassung}
+
 \ifbool{consistentlayout}{
     \DeclareDocumentEnvironment{abstract}{ O{} }{%
         \addchap*{\abstractname}%
