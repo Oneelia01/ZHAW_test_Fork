@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is a LaTeX template for Bachelor or Master theses at ZHAW, in accordance with the 
 % guidelines provided here:
 % https://www.zhaw.ch/en/lsfm/study/studiweb/master-ls/masters-thesis/
@@ -15,14 +15,14 @@
 % 
 % Template license:
 % CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------------------------------------------------------------------
 % DOCUMENT SPECIFICATION
 %----------------------------------------------------------------------------------------
 \documentclass[
     11pt,                      % Default font size
-    %oneside,                  % One-side binding. Default: Two-side binding / alternating margins
+    oneside,                   %One-side binding. Default: Two-side binding / alternating margins
     ngerman,                   % Language. Use ngerman for German (Neue Rechtschreibung)
     singlespacing,             % Spacing option: singlespacing, onehalfspacing or doublespacing
     %nolistspacing,            % Set spacing in lists to single
@@ -56,6 +56,8 @@
 % PREAMBLE: PACKAGES AND CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 \input{preamble}
+%\bibliography{example}
+
 
 
 %----------------------------------------------------------------------------------------
@@ -68,24 +70,21 @@
 % - Abstract / Zusammenfassung
 % - Meta information of PDF
 
-\thesistitle{MVB-Sniffer}             % Thesis title,              command: \ttitle
-\thesistype{Projektarbeit}             % Type of thesis (e.g. Master Thesis) \ttype
-\thesisdate{20.12.2024}                     % Date of submission                  \tdate
-\keywords{Manchester Decoding, Sniffer und Datalogger, Multifunction Vehicle Bus, MVB}
-                                        % Keywords for the thesis,            \keywordnames
+\thesistitle{MVB-Sniffer}               % Thesis title,              command: \ttitle
+\thesistype{Projektarbeit}              % Type of thesis (e.g. Master Thesis) \ttype
+\thesisdate{20.12.2024}                 % Date of submission                  \tdate
+\keywords{Manchester Decoding, Sniffer und Datalogger, Multifunction Vehicle Bus, MVB}      % Keywords for the thesis,            \keywordnames
 \authorA{Noah Häuptli}                  % Your name,
 \authorB{Dario Iaquinto}
 \authorC{Moritz Zweifel}
 \authorS{Noah Häuptli, Dario Iaquinto, Moritz Zweifel}
-\degree{Bachelor of Science ZFH}          % Degree name,                        \degreename
-\studyprogram{Systemtechnik} 
-                                        % Study program                       \studyprog
-\studyprogramlink{https://www.zhaw.ch/de/engineering/studium/bachelorstudium/systemtechnik/}
-                                        % Link to study program               \studyproglink
+\degree{Bachelor of Science ZFH}            % Degree name,                        \degreename
+\studyprogram{Systemtechnik}                % Study program                       \studyprog
+\studyprogramlink{https://www.zhaw.ch/de/engineering/studium/bachelorstudium/systemtechnik/}    % Link to study program               \studyproglink
 
-\supervisorA{Patrick Rennahard}       % Name of supervisor 1,               \supnameA
-\supervisorAmail{patrick.rennhard@zhaw.ch}         % Email address of supervisor 1,      \supmailA
-\supervisorAweb{}  %            \supwebA
+\supervisorA{Patrick Rennahard}             % Name of supervisor 1,               \supnameA
+\supervisorAmail{patrick.rennhard@zhaw.ch}  % Email address of supervisor 1,      \supmailA
+\supervisorAweb{}                           %            \supwebA
 \supervisorAinfo{                       % Formatted info about supervisor 1:  \supinfoA
     \supnameA\\
     ZHAW School of Engineering\\
@@ -108,7 +107,7 @@
                                         % University, in German               \univnameger
 \unversityabbr{ZHAW}                    % University abbreviation             \univabbr
 
-\department{Shool of Engineering} 
+\department{School of Engineering} 
                                         % Department,                         \deptname
 \institute{Institute of Signal Processing and Wireless Communications} 
                                         % Institute,                          \instname
@@ -139,17 +138,18 @@
 %----------------------------------------------------------------------------------------
 % TITLE PAGE AND IMPRINT
 %----------------------------------------------------------------------------------------
+\include{Appendices/DeclarationOfOriginalityZHAW}
 \include{Front/titlepage}
 \let\cleardoublepage\clearpage
-\include{Front/imprint}
+%\include{Front/imprint}
 
 
 %----------------------------------------------------------------------------------------
 % DECLARATION
 %----------------------------------------------------------------------------------------
 % Comment out this section if the declaration of originality from ZHAW is used.
-\include{Front/declaration}
-\cleardoublepage
+%\include{Front/declaration}
+%\cleardoublepage
 
 
 %----------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@
 %----------------------------------------------------------------------------------------
 % ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
-\include{Front/acknowledgements}
+%\include{Front/acknowledgements}
 
 
 %----------------------------------------------------------------------------------------
@@ -176,7 +176,7 @@
 %----------------------------------------------------------------------------------------
 % ABBREVIATIONS / SYMBOLS
 %----------------------------------------------------------------------------------------
-\include{Front/symbols}
+%\include{Front/symbols}
 
 
 
@@ -190,11 +190,24 @@
 % Include the chapters of the thesis as separate files from the Chapters folder
 % Uncomment the lines as you write the chapters
 
-\include{Chapters/Chapter1}
-\include{Chapters/Chapter2} 
-%\include{Chapters/Chapter3}
-%\include{Chapters/Chapter4} 
-%\include{Chapters/Chapter5} 
+%\include{Chapters/Chapter1}
+%\include{Chapters/Chapter2} 
+
+\include{Chapters/Kapitel1_Einleitung}
+\include{Chapters/Kapitel2_Theorie}
+\include{Chapters/Kapitel3_Methode}
+\include{Chapters/Kapitel4_Resultate}
+\include{Chapters/Kapitel5_Diskusion}
+\include{Chapters/Kapitel6_Verzeichnisse}
+
+%----------------------------------------------------------------------------------------
+% LIST OF ABBREVIATIONS / SYMBOLS / FIGURES/TABLES PAGES
+%----------------------------------------------------------------------------------------
+
+%\include{Front/symbols}
+% \bibliography{example}
+%\listoffigures    % Add list of figures
+%\listoftables     % Add list of tables
 
 
 %----------------------------------------------------------------------------------------
@@ -205,16 +218,21 @@
 % Include the appendices of the thesis as separate files from the Appendices folder
 % Uncomment the lines as you write the Appendices
 \include{Appendices/AppendixA}
+\include{Appendices/AppendixB}
 % from https://www.zhaw.ch/en/lsfm/study/studiweb/master-ls/masters-thesis/
 %\include{Appendices/AppendixB}
 %\include{Appendices/AppendixC}
-\include{Appendices/DeclarationOfOriginalityZHAW} 
+%\include{Appendices/DeclarationOfOriginalityZHAW}
+
+
+
 
 
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
-\printbibliography[heading=bibintoc]
+\printbibliography[]
+% \printbibliography[heading=bibintoc]
 
 %----------------------------------------------------------------------------------------
 
