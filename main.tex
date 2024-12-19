@@ -33,7 +33,7 @@
     %nohyperref,               % Disable links in the entire document
     % helveticafont,             % Uncomment to use Helvetica font
     headsepline,               % Show a horizontal line under the header
-    %chapterinoneline,         % Place the chapter title and chapter number on one line
+    chapterinoneline,         % Place the chapter title and chapter number on one line
     consistentlayout,          % Have the same layout for special chapters: 
                                % declaration, abstract and acknowledgements
 ]{MastersDoctoralThesis}
@@ -55,7 +55,7 @@
 % PREAMBLE: PACKAGES AND CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 \input{preamble}
-%\bibliography{example}
+\bibliography{quellen}
 
 
 
@@ -223,6 +223,7 @@
 %----------------------------------------------------------------------------------------
 \appendix % Cue to tell LaTeX that the following "chapters" are Appendices
 
+%\renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter}{}}
 % Include the appendices of the thesis as separate files from the Appendices folder
 % Uncomment the lines as you write the Appendices
 \include{Appendices/AppendixA}
@@ -239,7 +240,7 @@
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
-\printbibliography[]
+%\printbibliography[]
 %\printbibliography[heading=bibintoc]
 
 

@@ -31,6 +31,64 @@
 % \subsection{subs3}
 % \label{sec:}
 
+In diesem Kapitel wird der Prototyp "'MVB-Sniffer"' den definierten Zielen gegenübergestellt und diskutiert. Erhaltene Resultate bei den verschiedenen Testszenarien, wie diese in Kapitel \ref{sec:Testszenarien} beschrieben wurden, werden mit den erwarteten Daten verglichen. Des Weiteren werden in der Projektarbeit festgestellte Herausforderungen näher erläutert und mögliche Lösungsansätze besprochen.
+
+\section{Hardware FPGA}
+\label{sec:DiskussionHardwareFPGA}
+In diesem Kapitel werden die erhaltenen Resultate gemäss Kapitel \ref{sec:ResultatFPGA} mit den erwarteten Daten gemäss Kapitel \ref{sub:FPGADecSPITest} diskutiert.
+
+Wurde das Telegramm alle 100 ms übertragen, so konnten die erwarteten Daten korrekt empfangen werden. Wurde das generierte Signal aber jede ms gesendet, so gelang die Übertragung, nur im Falle ohne die Implementierung des 64-Bit Puffers, wie erwartet.
+
+Das Abtasten des Manchestersignal und die ununterbrochene Übertragung eines Nutzdatenbytes über SPI funktioniert fehlerfrei und sehr stabil.
+Dies zeigt auf, dass die Decodierungslogik des FPGA wie auch die Ausgabe auf die SPI korrekt und robust funktioniert.
+
+Sobald das ausgewertete Signal, und somit der Bitstream über den 64-Bit Puffer geleitet wird, entstehen teilweise Fehler in der Übertragung.
+Diese Fehler zeigen sich indem in einzelnen Fälle Daten in der Übertragung fehlen, oder auch falsche Daten übermittelt werden.
+Es kann keine Regelmässigkeit festgestellt werden, um welche Daten es sich dabei handelt und in welchem Abstand diese Fehler auftreten.
+
+Die genaue Ursache für die teilweise fehlenden oder falschen Daten in der Übertragung konnte nicht festgestellt werden.
 
 
 
+\section{Firmware ESP32-S3}
+\label{sec:DiskussionFirmwareESP32}
+Die erwarteten Werte aus Kapitel \ref{sub:ESPSPIundFSMTest} konnten in den Resultaten bestätigt werden. Der SPI-Master konnte, ohne einen Softwaredelay innerhalb des Programms zu verwenden, maximal alle 40 $\mu$s ein Paket mit 64 Bit an Daten versenden. Dies entspricht nicht den genannten Anforderungen des FPGA, welches ein SPI-Paket mit 64 Bit an Daten alle 24 $\mu$s schickt. 
+
+Der Test hat jedoch gezeigt, dass die Daten korrekt von der SPI-Schnittstelle empfangen werden, durch die spi\_queue richtig weitergegeben werden und von der State-Machine richtig verarbeitet werden. Der Pointer auf die aktuell abgespeicherten Daten wird korrekt über die ble\_queue weitergegeben und die Notification richtig verarbeitet und dem verbundenen Endgerät mitgeteilt. 
+
+Die Abbildungen \ref{fig:ReakKurz} und \ref{fig:ReakLang} zeigen, dass die Reaktionszeit 2 $\mu$s beträgt, bis die SPI-Peripherie nach Abschluss der Transaktion reagiert. Dies ist ein grosser Wert, für das eigentlich die Geschwindigkeit eines Interrupts erwartet wurde, welcher beinahe instantan auslöst.
+
+Diese Zeit lässt sich mit der Erklärung in der Slave Driver API Reference erklären. Die nachfolgende Erklärung wurde aus dem englischen Übersetzt: 
+
+\textit{Die ESP32-S3 SPI-Slave Peripherie ist als "'general purpose Device"' entwickelt und wird von der CPU gesteuert. [...] Alle Transaktionen müssen von der CPU durchgeführt werden, was bedeutet, dass das Senden und Empfangen nicht Echtzeit stattfinden und vielleicht bemerkbare Latenz vorhanden sind.}
+
+Dies schränkt die Nutzbarkeit der SPI-Peripherie ein. Die Transaktionslänge hängt zudem nicht mit dieser Zeit zusammen. Vergleichbare Zeiten wurden ebenfalls bei 16 oder 32 Bit an Daten gemessen. 
+
+Die Back-to-Receive-Zeit (BTR-Zeit) entspricht einem akzeptablen Wert von 12 $\mu$s. Da jede 24 $\mu$s ein neues 64-Bit Paket empfangen wird, hat die SPI-Peripherie genug Zeit, um auch bei grösserer Auslastung zu funktionieren. Eine Verkürzung der Übertragungspakete auf 32-Bit ist nicht sinnvoll, da 32-Bit Pakete jede 12 $\mu$s empfangen werden müssten und das kann nicht gewährleistet werden. 
+
+\section{Übertragung SPI}
+\label{sec:DiskussionÜbertragungSPI}
+
+Der Übertragungstest des SPI-Protokolls zwischen FPGA und ESP32-S3 war erfolgreich. Die Ergebnisse in Tabelle \ref{tab:EmpfTeleg3sTrigg} und Abbildung \ref{fig:VerbindungstestZeiten} bestätigen die Funktionalität der Kommunikation.
+
+Die Metadaten des vierten Frames (0x01) zeigen korrekt an, dass das Telegramm nur mit einem Master-Frame gesendet wurde. Während einer 60-sekün-digen Messung wurden alle Telegramme korrekt empfangen. Die gemessenen Zeiten für Reaktion 2 $\mu$s und Back-to-Receive 12 $\mu$s entsprechen den Anforderungen aus Kapitel \ref{sub:ESPSPIundFSMTest}.
+
+Die Busauslastung war im Test nicht repräsentativ für reale Szenarien, weshalb zusätzliche Stresstests durchgeführt wurden (Kapitel \ref{}). Diese dienen der Validierung unter höherer Belastung.
+
+Zusammenfassend arbeitet das System stabil und erfüllt die Anforderungen bei der Verarbeitung der Daten, vorbehaltlich der Ergebnisse des Stresstests.
+
+\section{Stressteset SPI-Übertragung}
+
+\section{Hardware Design}
+\label{sec:DiskussionHardware}
+
+Der
+Weshalb bin ich nicht weiter gekommen? Weshalb ist kein PCB bestellt worden?
+
+\section{Prototyp Sniffer}
+\label{sec:DiskussionSniffer}
+Das Minimal-Value Ziel wie es in der Tabelle \ref{tab:minvalueproduct} festgehalten ist, konnte nur teilweise erreicht werden. Die Auswertung und Übertragung bis hin zur Ausgabe per Bluetooth eines MVB-Telegrammes funktioniert fehlerfrei. Jedoch wurde im FPGA kein Zeitstempel implementiert, und weiter konnte das PCB in Altium nicht fertiggestellt werden.
+
+Hauptursachen zur Nichterreichung des Zieles sind aufgetretene Fehler in der Entwicklung und die fehlende Zeit zum Schluss der Projektarbeit. Dadurch dass Quartus zur Entwicklung und Synthetisierung des VHDL-Codes, als auch Altium zur Entwicklung des PCB, neue Entwicklungsumgebungen waren in denen noch keine Kenntnisse vorhanden waren, wurde mehr Zeit als geplant aufgewendet um die Umgebungen und dessen Prozesse kennen zu lernen, sodass ein erfolgreicher Sniffer entwickelt werden kann.
+
+Zu Beginn der Projektarbeit wurde ein Zeitplan (siehe Anhang \ref{app:Zeitplan}) erstellt, in welchem die zu erledigenden Arbeiten mit deren Sollzeit aufgelistet sind. Es ist zu sehen dass viele Abweichungen zwischen "'Ist"' und "'Soll"' festzustellen sind. Diese Abweichungen sind, wie bereits erwähnt, auf die Probleme in der Entwicklung und die längere Zeit zur Einarbeitung in die Entwicklungsumgebungen zurückzuführen. In der Mitte der Projektarbeit wurde ein Minimal-Value Ziel definiert. Daraufhin wurden einige geplante Aufgaben nicht mehr weiter verfolgt. Diese Aufgaben sind im Zeitplan unter "'Ist"' mit "'nicht ausgeführt"' vermerkt.

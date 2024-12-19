@@ -7,7 +7,8 @@
 %----------------------------------------------------------------------------------------
 \chapter{Einleitung} % Main chapter title
 \label{Einleitung}
-Im folgenden Kapitel werden die Ausgangslage, die Aufgabenstellung und das Ziel dieser Projektarbeit erläutert. 
+Im folgenden Kapitel werden die Ausgangslage, die Aufgabenstellung und das Ziel dieser Projektarbeit erläutert.
+
 %--------------------------------------------------------------------------------
 % SECTION Problemstellung
 %--------------------------------------------------------------------------------
@@ -18,11 +19,12 @@ Im folgenden Kapitel werden die Ausgangslage, die Aufgabenstellung und das Ziel 
 
 Die Schweizerischen Bundesbahnen (SBB) betreiben eine umfangreiche Flotte von Schienenfahrzeugen, die verschiedene Kommunikationssysteme nutzen. Der Multifunction Vehicle Bus (MVB) ist eines dieser Systeme und ermöglicht die Datenübertragung zwischen den elektronischen Komponenten und Systemen eines Zuges.
 
-Trotz der Robustheit des MVB können komplexe Störungen auftreten, die den Betrieb beeinträchtigen. Ein zentraler Grund für die Entwicklung eines MVB-Sniffers ist die Notwendigkeit, diese Störungen präzise zu identifizieren und zu analysieren. Durch die Aufzeichnung der Kommunikationsprotokolle können Probleme wie Kommunikationsausfälle diagnostiziert werden.
+Trotz der Robustheit des MVB können komplexe Störungen auftreten, die den Betrieb beeinträchtigen. Ein zentraler Grund für die Entwicklung eines MVB-Sniffers ist die Notwendigkeit, diese Störungen präzise zu identifizieren und zu analysieren. Ein Sniffer ist ein Gerät, welches Datenverkehr erfassen kann und durch die Aufzeichnung der Kommunikationsprotokolle ermöglicht, Probleme wie Kommunikationsausfälle zu diagnostizieren.
 
 Ein weiterer Grund für den Einsatz eines MVB-Sniffers ist die Beobachtung und Überwachung spezifischer MVB-Teilnehmer. Bestimmte Komponenten oder Systeme innerhalb eines Zuges können aufgrund ihrer kritischen Funktion oder ihrer Anfälligkeit für Störungen eine besondere Aufmerksamkeit erfordern. Die detaillierte Analyse des MVB fördert auch ein vertieftes Verständnis des Systems.
 
-Der MVB wird durch die Norm SN EN 61375-3-1 geregelt. Diese Norm beschreibt die grundlegenden Funktionsweisen und technischen Anforderungen des Kommunikationsprotokolls. Ergänzend dazu werden spezifische Aspekte des Linklayers auch in der Norm SN EN 61375-2-1, die den Wire Train Bus (WTB) behandelt, erläutert. Beide Normen bilden die Grundlage wie der MVB funktioniert. Die Präsentiation: \textcolor{red}{Hier referenzieren MVB (IEC 61375): a fieldbus case study von Prof. Dr. H. Kirrmann} bietet einen vertieften und anschaulichen überblick.
+Der MVB wird durch die Norm SN EN 61375-3-1 geregelt. Diese Norm beschreibt die grundlegenden Funktionsweisen und technischen Anforderungen des Kommunikationsprotokolls. Ergänzend dazu werden spezifische Aspekte des Linklayers auch in der Norm SN EN 61375-2-1, die den Wire Train Bus (WTB) behandelt, erläutert. Beide Normen bilden die Grundlage wie der MVB funktioniert. Die Präsentiation im Anhang \ref{app:File11} \textit{a fieldbus case study von Prof. Dr. H. Kirrmann} bietet einen vertieften und anschaulichen Überblick.
+
 %---------------------------------------------------------------------------------
 % SECTION Aufgabenstellung
 %---------------------------------------------------------------------------------
@@ -31,7 +33,7 @@ Der MVB wird durch die Norm SN EN 61375-3-1 geregelt. Diese Norm beschreibt die 
 \label{Aufgabenstellung} % Change X to a consecutive number
 
 %% Text hier
-Die nachfolgende Liste ist ein Orientierung und umfasst nicht alle notwendigen Einzelschritte. Die Reihenfolge der Schritte kann variieren und Änderungen oder das Weglassen von Schritten muss mit den betreuenden Personen besprochen werden. 
+Die nachfolgende Liste ist ein Orientierung und umfasst nicht alle notwendigen Einzelschritte. Die Reihenfolge der Schritte kann variieren und Änderungen oder das Weglassen von Schritten muss mit den betreuenden Personen besprochen werden. Im Rahmen der Projektarbeit fanden wöchentliche Sitzungen (Sitzungsprotokolle in Anhang \ref{app:File12}) statt, in denen über den aktuellen Stand und die aktuellen Probleme informiert wurde.
  \begin{enumerate}
      \item Machen Sie sich mit dem Thema vertraut
      \item Analyse der Anforderungen an den MVB-Sniffer mit Schwerpunkt bei der Elektronik 
@@ -53,7 +55,7 @@ c. Benutzeroberfläche zur Visualisierung der aufgezeichneten Daten
      \item Dokumentieren Sie alle Arbeitsschritte und verfassen Sie einen wissenschaftlichen Bericht, welcher Theorie, Methodik, Resultate und Diskussion beschreibt.
      \end{enumerate}
 
-\textcolor{red}{Referenz zu Aufgabenstellung im Anhang}
+Die ausgehändigte Aufgabenstellung befindet sich im Anhang \ref{app:Aufgabenstellung}.
 
 %---------------------------------------------------------------------------------
 % SECTION "Ziel der Arbeit"
@@ -63,10 +65,10 @@ c. Benutzeroberfläche zur Visualisierung der aufgezeichneten Daten
 \label{Ziel der Arbeit} % Change X to a consecutive number
 
 %% Text hier
-Das Hauptziel dieser Projektarbeit ist die Entwicklung eines MVB-Sniffers für die SBB, der Kommunikationsprotokolle in MVB-Netzwerken aufzeichnen kann. Zunächst wird ein Funktionsmuster auf Basis von Evaluationsboards erstellt und parallel wird eine eigene Elektronikplatine (PCB) entwickelt. Im Verlaufe der Projektarbeit wurde das Minimal Value Product definiert, siehe Tabelle 1.1, um klare Ziele für das Ende der Projektarbeit festzulegen.
+Das Hauptziel dieser Projektarbeit ist die Entwicklung eines MVB-Sniffers für die SBB, der Kommunikationsprotokolle in MVB-Netzwerken aufzeichnen kann. Zunächst wird ein Funktionsmuster auf Basis von Evaluationsboards erstellt und zu einem späteren Zeitpunkt soll eine eigene Elektronikplatine (PCB) entwickelt werden. Im Verlaufe der Projektarbeit wurde das Minimal Value Product definiert, siehe Tabelle \ref{tab:minvalueproduct}, um klare Ziele für das Ende der Projektarbeit festzulegen.
 \begin{table}[H]
 \centering
-\begin{tabular}{|p{1cm}|p{12cm}|}
+\begin{tabular}{|p{1cm}|p{13cm}|}
 \hline
 \textbf{Level} & \textbf{Beschreibung} \\ \hline
 0 Minimum Value & 
@@ -81,7 +83,7 @@ Software ist auf dem eigenen PCB implementiert und wurde mit aufgezeichneten MVB
 Der Datenaustausch zwischen ESP und FPGA wurde erweitert. Ein aktueller Zeitstempel wird übertragen. \\ \hline
 \end{tabular}
 \caption{Entwicklungsstufen des Minimal Value Product (MVP)}
-\label{tab:mvp_levels}
+\label{tab:minvalueproduct}
 \end{table}
 
 %---------------------------------------------------------------------------------
@@ -92,15 +94,19 @@ Der Datenaustausch zwischen ESP und FPGA wurde erweitert. Ein aktueller Zeitstem
 \label{Aufbau der Arbeit} % Change X to a consecutive number
 Diese Arbeit ist in vier Kapitel gegliedert, die im Folgenden vorgestellt und kurz beschrieben werden:
 
+\textbf{Einleitung}\\
+In der Einleitung folgt noch eine Einführung zu Sniffer Devices und eine Übersicht zur durchgeführten Recherche zu den bestehenden Geräten.
+
 \textbf{Theoretische Grundlagen}\\
-Im Kapitel \textit{Theoretische Grundlagen} wird der Aufbau des \textit{Multifunction Vehicle Bus} sowie die Funktionsweise der Datenübertragung erläutert.
+Im Kapitel \textit{Theoretische Grundlagen} wird der Aufbau des MVB, sowie die Funktionsweise der Datenübertragung erläutert.
 
 \textbf{Methode}\\
-Das Kapitel \textit{Methode} beschreibt in chronologischer Reihenfolge die Entwicklung des Sniffers. Zunächst wird eine Übersicht zur durchgeführten Recherche gegeben. Anschliessend wird die Messung und Auswertung zur Bestimmung der Busauslastung erklärt. Es wird dargestellt, wie der Sniffer gestaltet sein muss, um alle Anforderungen zu erfüllen. Ein weiteres Unterkapitel widmet sich der Wahl der Hardware. Abschliessend wird die Umsetzung der Logik im FPGA, der Software auf dem ESP32, sowie des PCB beschrieben.
+Das Kapitel \textit{Methode} beschreibt in chronologischer Reihenfolge die Entwicklung des Sniffers. Zuerst wird die Messung und Auswertung zur Bestimmung der Busauslastung erklärt. Es wird dargestellt, wie der Sniffer gestaltet sein muss, um alle Anforderungen zu erfüllen. Ein weiteres Unterkapitel widmet sich der Wahl der Hardware. Abschliessend wird die Umsetzung der Logik im FPGA, der Software auf dem ESP32, sowie des Schemas beschrieben.
 
 \textbf{Prototyp Sniffer}\\
 Im Kapitel \textit{Prototyp Sniffer} werden die im Zuge der ersten Umsetzung aufgetretenen Probleme sowie entsprechende Lösungsansätze behandelt. Zudem wird der Testprozess dokumentiert und die erhaltenen Resultate werden vorgestellt.
 
 \textbf{Diskussion und Ausblick}\\
-Im letzten Kapitel \textit{Diskussion und Ausblick} werden die erreichten und nicht erreichten Ziele den zu Beginn festgelegten Erwartungen gegenübergestellt und reflektiert. Abschliessend wird ein Ausblick auf die Weiterentwicklung des MVB-Sniffers im Rahmen der Bachelorarbeit gegeben.
-
+Im letzten Kapitel \textit{Diskussion und Ausblick} werden die erreichten und nicht erreichten Ziele den zu Beginn festgelegten Erwartungen gegenübergestellt und reflektiert. Abschliessend wird ein Ausblick auf die Weiterentwicklung des MVB-Sniffers im Rahmen der Bachelorarbeit gegeben.\\
+\\
+Es sei erwähnt, dass in dieser Arbeit das generative KI-Tool ChatGPT für Textformulierungen, Rechtschreibkorrekturen und für die Generierung von Code verwendet wurde.

@@ -4,13 +4,12 @@
 \section{Design eigener Sniffer}
 \label{Design Sniffer}
 
-Zu Beginn der Projektarbeit wurde ein Prozessdiagramm erstellt, welches aufzeigen soll, welche Hardware
-benötigt wird um einen Sniffer entwickeln zu können, welcher vom MVB lesen kann.
+Zu Beginn der Projektarbeit wurde ein Prozessdiagramm erstellt, welches aufzeigen soll, welche Hardware benötigt wird um einen Sniffer zu entwickeln, welcher vom MVB lesen kann.
 Dieser erste Entwurf ist in Abbildung \ref{fig:AufbauSnifferDraft} zu sehen.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{Figures/Chap3/Design Eigener Sniffer/Sniffer_Aufbau_Draft.png}
+    \includegraphics[width=1\linewidth]{Figures/Chap3/Design Eigener Sniffer/Draft_Aufbau_Sniffer.png}
     \caption{Erste Darstellung Aufbau Sniffer}
     \label{fig:AufbauSnifferDraft}
 \end{figure}
@@ -35,12 +34,12 @@ wegfällt, da durch den RS485-Transceiver sichergestellt wird, dass der Bus nie 
 Im finalen Design kommt zusätzlich die Ausgabe über Bluetooth hinzu welche zu beginn nicht angedacht
 war.
 
-Um aus dem Differentiellen Manchestersignal vom MVB ein Single-Ended Signal, welches "'0 V"' bei einer 
-Negativen Flanke und "'3.3 V"' bei einer Positiven Flanke annehmen soll, erzeugen zu können, wurde ein
+Um aus dem differentiellen Manchestersignal vom MVB ein Single-Ended Signal, welches "'0 V"' bei einer 
+negativen Flanke und "'3.3 V"' bei einer positiven Flanke annehmen soll, erzeugen zu können, wurde ein
 RS485-Transceiver verwendet. Der Transceiver wird mit einer Spannung von "'3.3 V"' versorgt. Das
-erzeugte digitale Signal vom RS485 wird weiter ins FPGA (Field Programmable Gate Array) geleitet, wo
-der Manchestercode decodiert wird und als Bitstream über das SPI an den µKontroller ESP32 gesendet
-wird. Der µKontroller wertet die Daten aus und gibt dann die entsprechenden Codes per Bluetooth aus.
+erzeugte digitale Signal vom RS485 wird weiter ins Field Programmable Gate Array (FPGA) geleitet, wo
+der Manchestercode decodiert wird und als Bitstream über das SPI an den Mikrocontroller ESP32 gesendet
+wird. Der Mikrocontroller wertet die Daten aus und gibt dann die entsprechenden Codes per Bluetooth aus.
 
 In einer Prototypenphase und somit auch im Rahmen der Projektarbeit, sind dafür drei verschiedene
 Evaluationsboards verwendet worden. Das definierte Ziel für den fertigen Sniffer, welches in der
@@ -56,20 +55,31 @@ festgehalten.
 
 
 \subsubsection{RS485}
-Der RS485 Transceiver macht aus einem differentiellen Signal ein Digitales Signal, welches zwischen der Speisespannung und 0V hin und her wechselt. Das Ausgangssignal kann dann im Falle des MVB von Busteilnehmern ausgewertet werden. Da im Anwendungsbereich des MVB (ESD) auf den Schienenfahrzeugen, für welche der Sniffer ausgelegt wird, bereits RS485 Transceiver eingesetzt werden, war es naheliegend und sinnvoll diese auch für den Sniffer einzusetzen.
+Der RS485 Transceiver macht aus einem differentiellen Signal ein digitales Signal, welches zwischen der Speisespannung und 0V hin und her wechselt. Das Ausgangssignal kann im Falle des MVB von Busteilnehmern ausgewertet werden. Da im Anwendungsbereich des MVB (ESD) auf den Schienenfahrzeugen, für welche der Sniffer ausgelegt wird, bereits RS485 Transceiver eingesetzt werden, war es naheliegend und sinnvoll diese auch für den Sniffer einzusetzen.
 
 \subsubsection{FPGA}
-In einer ersten Recherche war eine Lösungsvariante, die Decodierung des Manchestersignal in einer reinen Hardwarelösung wie sie in Abbildung \ref{} zu sehen ist umzusetzen. Als eine weitere Variante wurde dann das FPGA zur Umsetzung des Decoders in Anbetracht gezogen.
-Der Entscheid für den FPGA und gegen die, nicht programmierbare, reine Hardwarelogik, lag in folgenden Punkten:
+In einer ersten Recherche war eine Lösungsvariante, die Decodierung des Manchestersignal in einer reinen Hardwarelösung wie sie in Abbildung \ref{fig:Manchester Decoder} zu sehen ist umzusetzen.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Figures/Chap3/Design Eigener Sniffer/manchester_decoder.png}
+    \caption{Manchester Decoder \cite{Manchester_Decoding}}
+    \label{fig:Manchester Decoder}
+\end{figure}
+%\textcolor{red}{Bild von https://community.infineon.com/t5/PSOC-5-3-1/Machester-Decoder-using-Psoc/td-p/41723}
+
+Als eine weitere Variante wurde das FPGA zur Umsetzung des Decoders in Betracht gezogen.
+Der Entscheid für den FPGA und gegen die nicht programmierbare, reine Hardwarelogik lag in folgenden Punkten:
 \begin{itemize}
   \item Die Logik des FPGA ist flexibel und schnell anpassbar.
-  \item Das FPGA kann weiter konfiguriert werden um bei einer Weiterentwicklung des Sniffers, können weitere Aufgaben Problemlos zu implementiert werden.
-  \item Das Interesse ein FPGA und dessen Programmierung in VHDL näher kennen zu lernen war gross und in diesem Projekt sicherlich gut realisierbar.
+  \item Das FPGA kann weiter konfiguriert werden und bei einer Weiterentwicklung des Sniffers können weitere Aufgaben problemlos implementiert werden.
+  \item Das Interesse ein FPGA und dessen Programmierung in Very High-Speed Integrated Circuit Hardware Description Language (VHDL) näher kennen zu lernen war gross und in diesem Projekt gut realisierbar.
 \end{itemize}
 
-\newpage
+Für die Projektarbeit wurde das FPGA-Entwicklungskit 10M08SAE144C8G zur Verfügung gestellt.
+
 \subsubsection{SPI}
-Für die Kommunikation zwischen FPGA und ESP32 wurde das Protokoll SPI gewählt, weil es diese Kommunikation möglich macht gleichzeitig zu schreiben und aber auch Daten zu empfangen, SPI ist \textit{"'Full Duplex"'}. Des weiteren können mit diesem Übertragungsprotokoll sehr hohe Raten erreicht werden, welche bei der berechneten Busauslastung (siehe Kapitel \ref{fig:MessaufbauBusauslastungMessen}) von Vorteil ist. Alternativ hätten weitere Protokolle gewählt werden können. In Tabelle \ref{tab:spi_vergleich} ist ein kurzer Vergleich von SPI und zwei alternativen Kommunikationsprotokollen I²C und UART zu sehen. SPI ist dabei, wie bereits erwähnt, mit Abstand am schnellsten und auch einfach zu implementieren.
+Für die Kommunikation zwischen FPGA und ESP32 wurde das Protokoll SPI gewählt, weil es diese Kommunikation möglich macht gleichzeitig zu schreiben, sowie Daten zu empfangen (Full Duplex fähig). Des Weiteren können mit diesem Übertragungsprotokoll sehr hohe Raten erreicht werden, welche bei der berechneten Busauslastung (siehe Kapitel \ref{fig:MessaufbauBusauslastungMessen}) von Vorteil ist. Alternativ hätten weitere Protokolle gewählt werden können. In Tabelle \ref{tab:spi_vergleich} ist ein kurzer Vergleich von SPI und zwei alternativen Kommunikationsprotokollen (I²C und UART) zu sehen. SPI ist dabei, wie bereits erwähnt, mit Abstand am schnellsten und einfach zu implementieren.
 
 \begin{table}[ht]
 \renewcommand{\arraystretch}{1.5} % Zeilenabstand erhöhen
@@ -90,6 +100,5 @@ Für die Kommunikation zwischen FPGA und ESP32 wurde das Protokoll SPI gewählt,
 \end{table}
 
 \subsubsection{ESP32}
-\textcolor{red}{Warum wurde der µKontroller ESP32 gewählt?}\\
-Der ESP32 wurde gewählt, weil dieser die Funktionalität von Bluetooth Low Energy 
+Der ESP32 wurde gewählt, weil bereits Erfahrungen im Programmieren des IoT Chips in der Gruppe vorhanden sind und die ESP32 Familie die nötigen Peripherie-Elemente wie SPI und Bluetooth Low Energy bereits implementiert hat. Die S3 Variante wurde spezifisch gewählt, da es ein Dual-Code Prozessor ist und ein USB-OTG Controller implementiert ist, welcher das direkte Schreiben auf USB-Sticks ermöglicht. 
 
