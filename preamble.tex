@@ -112,10 +112,16 @@
 %----------------------------
 
 % Set up references
+% \usepackage[
+%     backend=biber,             % Use biber backend (an external tool)
+%     sorting=none,              % Enumerates the reference in order of their appearance
+%     style=ieee %numeric-comp         % Choose here your preferred citation style
+% ]{biblatex}
+
 \usepackage[
-    backend=biber,             % Use biber backend (an external tool)
-    sorting=none,              % Enumerates the reference in order of their appearance
-    style=numeric-comp         % Choose here your preferred citation style
+    backend=biber,
+    style=ieee,
+    sorting=none
 ]{biblatex}
 \addbibresource{quellen.bib}   % The filename of the bibliography
 \usepackage[autostyle=true]{csquotes} 

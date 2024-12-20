@@ -19,7 +19,7 @@ Der Code ist in fünf Dateien aufgeteilt. Zwar wurde dieser in seine verschieden
 Decodierung des Signals (siehe Kapitel \ref{Manchester Decodierung}), der Ausgabe des Bitstream auf SPI
 (siehe Kapitel \ref{fpga:spi}), der Erzeugung der Taktfrequenz für die Abtastung des Manchestersignal,
 dem Puffern der Werte nach der Abtastung (siehe Kapitel \ref{fpga:spi}) und zuletzt wurde eine Top-Level Datei erstellt um all diese
-Prozesse zu verknüpfen und die Ein- und Ausgänge des FPGA zu konfigurieren.
+Prozesse zu verknüpfen und die Ein- und Ausgänge des FPGA zu konfigurieren. Der zugehörige Code ist in Anhang \ref{app:File31} zu finden.
 
 In Abbildung \ref{fig:AufbauFPGA} sind graphisch in Blockschaltbildern die Verknüpfungen der Dateien zu sehen.
 
@@ -33,7 +33,7 @@ In Abbildung \ref{fig:AufbauFPGA} sind graphisch in Blockschaltbildern die Verkn
 In den folgenden Unterkapiteln werden die einzelnen wichtigsten Prozesse genauer erklärt.\\
 \\
 Dabei ist wichtig zu erwähnen, dass durch die Decodierung des Manchestersignal, aus einem Bit
-(Manchester-Codiert) zwei Bits (Bitstream) werden. Das heisst im 16 Bit grossen 
+(Manchester-Codiert) zwei Bit (Bitstream) werden. Das heisst im 16 Bit grossen 
 \textit{data\_value\_reg} ist jeweils ein Byte des MVB abgebildet.\\
 \newline
 In dieser Arbeit gelten folgende Einheitsnamen und Datengrössen:\\
@@ -59,7 +59,7 @@ Werte, welche ins 16 Bit grosse Register \textit{data\_value\_reg} geschrieben w
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Figures/Chap3/FPGA/Abtastpunkte_Master.png}
-    \caption{Masterframe Startdelimiter mit Abtastpunkten}
+    \caption{Master-Frame Start-Delimiter mit Abtastpunkten}
     \label{fig:MasterframeAbtastung}
 \end{figure}
 
@@ -95,17 +95,17 @@ Im Zustand \textit{RECEIVING} werden Fortlaufend die abgetasteten Werte ins Regi
 
 Da der Abtasttakt nicht synchron mit dem MVB-Takt läuft kann es zu leichten Abweichungen kommen, was dazu führt dass der Flankenwechsel nicht bei Bit 4 auf
 3 sondern bei Bit 3 auf 2 oder bei Bit 5 auf 4 zu sehen ist. Um diese weiteren Fälle abzufangen, werden jeweils nicht nur die 
-mittleren zwei Bits auf ihre Werte überprüft, sondern gleich die mittleren vier Bits. Somit überprüft der Auswerteprozess das Register nicht nur auf vier, sondern auf acht Fälle.
+mittleren zwei Bit auf ihre Werte überprüft, sondern gleich die mittleren vier Bit. Somit überprüft der Auswerteprozess das Register nicht nur auf vier, sondern auf acht Fälle.
 
 Da das Register \textit{data\_value\_reg} 16 Werte beinhaltet würde es noch weitere acht Fälle
-geben. Das Eintreffen der weiteren Acht Fälle wird durch ein shiften der Bits, wenn das Signal über
+geben. Das Eintreffen der weiteren Acht Fälle wird durch ein shiften der Bit, wenn das Signal über
 drei Auswertezyklen hinweg nicht synchron läuft, verhindert. Somit muss die Auswertelogik Acht
 Fälle implementiert haben und diese korrekt abarbeiten.
 
 In Abbildung \ref{fig:FPGAreg_sampleCases} sind alle 16 möglichen Fälle zu 
 sehen, welche das Register \textit{data\_value\_reg} annehmen könnte, wenn davon 
 ausgegangen wird, dass keine Korrektur durch Shifting implementiert ist und wenn
-alle 16 Bits zur Auswertung betrachtet würden.
+alle 16 Bit zur Auswertung betrachtet würden.
 
 \begin{figure}[H]
     \centering
@@ -128,10 +128,9 @@ geschrieben.\\
 In diesen Fällen notwendig. Dieser Prozess wird in Kapitel \ref{Shifting-Prozess}
 erläutert.
 
-In den Fällen neun bis 16 sind die Werte um zwei oder um drei Bits verschoben. Diese Fälle würden dann auftreten, wenn sich das MVB-Signal innerhalb von acht
+In den Fällen neun bis 16 sind die Werte um zwei oder um drei Bit verschoben. Diese Fälle würden dann auftreten, wenn sich das MVB-Signal innerhalb von acht
 Abtastungen um zwei ganze Abtastwerte verschiebt. Dies entspricht einer
-Verschiebung um 25 \%. In der Norm \textcolor{red}{Norm referenzieren} ist
-festgehalten dass eine maximale Abweichung zur Taktfrequenz 1.5 MHz um 0.01 \% vorkommen kann.\\
+Verschiebung um 25 \%. In der Norm IEC 61375-3-1 ist festgehalten dass eine maximale Abweichung zur Taktfrequenz 1.5 MHz um 0.01 \% vorkommen kann. \cite{MVB_Norm}\\
 Daher werden die Fälle 9 bis 16 nie erreicht und müssen nicht in der Auswertelogik
 implementiert sein.
  
@@ -207,7 +206,7 @@ gesetzt werden und in welche Richtung \textit{count\_shift} zählt.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Figures//Chap3//FPGA/FPGA_Shifting.png}
-    \caption{Fälle in denen ein Shifting der Bits notwendig ist}
+    \caption{Fälle in denen ein Shifting der Bit notwendig ist}
     \label{fig:FPGAShiftingCases}
 \end{figure}
 
@@ -254,29 +253,26 @@ END PROCESS;
 
 \subsection{SPI}
 \label{fpga:spi}
-Damit die Daten aus dem Register \textit{data\_value\_reg} für die weitere Auswertung und Verarbeitung an den Mikrocontroller ESP32 übertragen werden können, wurde das Übertragungsprotokoll SPI implementiert.\\
+Damit die Daten aus dem Register \textit{data\_value\_reg} für die weitere Auswertung und Verarbeitung an den Mikrocontroller ESP32-S3 übertragen werden können, wurde das Übertragungsprotokoll SPI implementiert.\\
 \\
-Als Basis zum VHDL-Code wurde die bereits geschriebene SPI-Master Implementierung von Github genommen und angepasst.
-Der bereits geschriebene Code ist unter dem Link \href{https://github.com/nematoli/SPI-FPGA-VHDL/blob/master/hdl/spi_master.vhd}{\textit{https://github.com/nematoli/SPI-FPGA-VHDL/blob/master/hdl/spi\_master.vhd}} \\zu finden.
+Als Basis zum VHDL-Code wurde die bereits geschriebene SPI-Master Implementierung von Github genommen und angepasst. \cite{SPI_git}
 
 
-Es wurde festgelegt, dass das FPGA als Master und der ESP32 als Slave agiert. Als Modi wurden \textit{CPOL=0} und \textit{CPHA=0} bestimmt. Die Übertragungsfrequenz wurde möglichst hoch gewählt, damit die Daten sicherlich schneller übertragen, als die neu abgetasteten Werte wieder ins Register geschrieben, werden.
-Das FPGA sowohl als auch der ESP32 mussten die Frequenz erreichen können. Schlussendlich wurde 20 MHz als Übertragungsrate festgelegt.
+Es wurde festgelegt, dass das FPGA als Master und der ESP32-S3 als Slave agiert. Als Modi wurden \textit{CPOL=0} und \textit{CPHA=0} bestimmt. Die Übertragungsfrequenz wurde möglichst hoch gewählt, damit die Daten sicherlich schneller übertragen, als die neu abgetasteten Werte wieder ins Register geschrieben, werden.
+Das FPGA sowohl als auch der ESP32-S3 mussten die Frequenz erreichen können. Schlussendlich wurde 20 MHz als Übertragungsrate festgelegt.
 
 Werden immer, sobald das Register \textit{data\_value\_reg} voll ist, die Daten auf das SPI übertragen, so würden alle \textit{5.33 µs} neue Daten übertragen werden. Die Zahl berechnet sich folgendermassen:
 % Requires: \usepackage{siunitx}
 
 \begin{equation}
-    8 \, \text{Nutzdatenbit} \times 666 \, \text  ns = 5328 \, \text  ns = 5.33  \mu\text  s \label{eq:calc_Nutzdatenbit1}
+    8 \, \text{ Nutzdatenbit} \times 666 \, \text{ ns} = 5328 \, \text{ ns} = 5.33 \text{ }  \mu\text  s \label{eq:calc_Nutzdatenbit1}
 \end{equation}
-\textcolor{red}{Abstand zu Einheiten weiss nicht wie einfügen}
 
-Da der ESP32 nur alle \textit{16 µs} neue Daten empfangen kann (siehe Kapitel \ref{sec:ResultatESP32}) wurde entschieden, dass das FPGA die Daten jeweils puffert und sobald der Puffer von 32 Nutzdatenbits voll ist, diesen auf das SPI überträgt. Damit ergibt sich folgende Zeit zwischen den Übertragungen:
+Da der ESP32-S3 nur alle \textit{16 µs} neue Daten empfangen kann (siehe Kapitel \ref{sec:ResultatESP32}) wurde entschieden, dass das FPGA die Daten jeweils puffert und sobald der Puffer von 32 Nutzdatenbits voll ist, diesen auf das SPI überträgt. Damit ergibt sich folgende Zeit zwischen den Übertragungen:
 
 \begin{equation}
-    32 \, \text{Nutzdatenbit} \times 666 \, \text ns = 21312 \, \text ns = 21.3  \mu\text s \label{eq:calc_Nutzdatenbit2}
+    32 \, \text{ Nutzdatenbit} \times 666 \, \text{ ns} = 21312 \, \text{ ns} = 21.3 \text{ }  \mu\text s \label{eq:calc_Nutzdatenbit2}
 \end{equation}
-\textcolor{red}{Abstand zu Einheiten weiss nicht wie einfügen}
 
 Unterhalb ist die Logik für das Schreiben des Puffers in VHDL zu sehen:
 \begin{lstlisting}[language=vhdl]
@@ -308,4 +304,4 @@ BEGIN
 END PROCESS;
 \end{lstlisting}
 
-Wodurch der ESP32 genug Zeit für die Verarbeitung hat und somit alle Daten korrekt und ohne Verlust übertragen werden können.
+Wodurch der ESP32-S3 genug Zeit für die Verarbeitung hat und somit alle Daten korrekt und ohne Verlust übertragen werden können.

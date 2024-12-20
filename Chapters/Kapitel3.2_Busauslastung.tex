@@ -30,17 +30,17 @@ Der Messaufbau blieb für die Messungen unter Normallast und Volllast identisch.
 Das Picoscope-Oszilloskop wurde für die Messung mit einer Abtastrate von 62,5 MS/s konfiguriert, was einem Abtastintervall von 16 ns entspricht. Diese maximale Abtastrate wurde gewählt, um selbst kleinste Signaländerungen erfassen zu können. 
 
 \subsection{Matlab Auswertung}
-Die Auswertung der Analogwerte wurde mit Matlab realisiert. Ziel war es, herauszufinden, wie gross die Busauslastung in Bits/s ist. Für die Übertragung mit Bluetooth waren alle Daten ausser die Startdelimiter (siehe Kapitel \ref{sub:StartDelimiter}) von Interesse. Die Auswertung mit Matlab war ebenfalls eine Überlegungsgrundlage für die spätere Implementierung in den FPGA (siehe Kapitel \ref{Manchester Decodierung}). Die Auswertung ist in folgende Schritte untertielt:
+Die Auswertung der Analogwerte wurde mit Matlab realisiert. Ziel war es, herauszufinden, wie gross die Busauslastung in Bit/s ist. Für die Übertragung mit Bluetooth waren alle Daten ausser die Start-Delimiter (siehe Kapitel \ref{sub:StartDelimiter}) von Interesse. Die Auswertung mit Matlab war ebenfalls eine Überlegungsgrundlage für die spätere Implementierung in den FPGA (siehe Kapitel \ref{Manchester Decodierung}). Die Auswertung ist in folgende Schritte untertielt:
 \begin{enumerate}
     \item Delimiter Erkennung
-    \item Bestimmung Anzahl Bits
+    \item Bestimmung Anzahl Bit
     \item Differenz bilden
 \end{enumerate}
 
 
 \subsubsection{Delimiter erkennen}
 %\textcolor{red}{Anzahl delimiter erkennen. Charakteristik erkannt -> letzte werte Idle, dann Nulldurchgang, aber nur wenn einer der nächsten 20 Werte über null ist, sonst wurde peak am schluss auch gezählt. }
-Um die Startdelimiter zu erkennen, wurde die Charakteristik eines Delimiters gemäss Kapitel \ref{sub:StartDelimiter} untersucht. In Abbildung \ref{fig:AusschnittMvbOhneDds} wurde der Zeitbereich vergrössert. Dadurch lässt sich ein Telegramme (gemäss Kapitel \ref{sub:MasterSlavePrinzip}) besser sehen.
+Um die Start-Delimiter zu erkennen, wurde die Charakteristik eines Delimiters gemäss Kapitel \ref{sub:StartDelimiter} untersucht. In Abbildung \ref{fig:AusschnittMvbOhneDds} wurde der Zeitbereich vergrössert. Dadurch lässt sich ein Telegramme (gemäss Kapitel \ref{sub:MasterSlavePrinzip}) besser sehen.
 
 \begin{figure}[H]
     \centering
@@ -49,36 +49,36 @@ Um die Startdelimiter zu erkennen, wurde die Charakteristik eines Delimiters gem
     \label{fig:AusschnittMvbOhneDds}
 \end{figure}
 
-Zu sehen ist, ein vollständiges Master-Frame, das darauffolgende Slave-Frame und der Anfang des nächsten Master-Frames. Das Idle Signal verbindet die Frames. Der Startdelimiter fängt bei der ersten negativen Flanke an. Gemäss Norm muss das Slave-Frame in einem Zeitraum zwischen 2 - 6 $\mu$s folgen. Somit kann die Charakteristik des Startdelimiters wie folgt zusammengefasst werden: Ist das Idle Signal für mindestens 2 μs anstehend, beginnt der Startdelimiter bei der ersten negativen Flanke
+Zu sehen ist, ein vollständiges Master-Frame, das darauffolgende Slave-Frame und der Anfang des nächsten Master-Frames. Das Idle Signal verbindet die Frames. Der Start-Delimiter fängt bei der ersten negativen Flanke an. Gemäss Norm muss das Slave-Frame in einem Zeitraum zwischen 2 - 6 $\mu$s folgen. Somit kann die Charakteristik des Start-Delimiters wie folgt zusammengefasst werden: Ist das Idle Signal für mindestens 2 μs anstehend, beginnt der Start-Delimiter bei der ersten negativen Flanke
 
-Diese Definition konnte so nicht umgesetzt werden, da dies zu mehreren Fehlererkennungen geführt hat, da die Periode zwischen Master- und Slave-Frame teilweise unter 2 $\mu$s waren und weil ein negativer Puls am Ende des Master- oder Slave-Frames die Bedingung der Idle Zeit verletzte. Stattdessen wurde ein Zeitbereich von 0.5 Bitdauer gewählt und die zusätzliche Bedingung eingeführt, dass nach Erkennung einer negativen Flanke in der nächsten 0.5 Bitdauer mindestens ein Wert über 0V sein muss. Daraus gab sich der Algorithmus zur Erkennung der Startdelimiter und die erkannten Punkte werden in Abbildung \ref{fig:enter-label} gezeigt.
+Diese Definition konnte so nicht umgesetzt werden, da dies zu mehreren Fehlererkennungen geführt hat, da die Periode zwischen Master- und Slave-Frame teilweise unter 2 $\mu$s waren und weil ein negativer Puls am Ende des Master- oder Slave-Frames die Bedingung der Idle Zeit verletzte. Stattdessen wurde ein Zeitbereich von 0.5 Bitdauer gewählt und die zusätzliche Bedingung eingeführt, dass nach Erkennung einer negativen Flanke in der nächsten 0.5 Bitdauer mindestens ein Wert über 0V sein muss. Daraus gab sich der Algorithmus zur Erkennung der Start-Delimiter und die erkannten Punkte werden in Abbildung \ref{fig:enter-label} gezeigt.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{Figures/Chap3/Busauslastung/Ausschnitt_MVB_mit_Delimiter.png}
     \caption{Ausschnitt der MVB Messung unter Normallast mit
-Startdelimiter Erkennung (rote X)}
+Start-Delimiter Erkennung (rote X)}
     \label{fig:enter-label}
 \end{figure}
 
 
-\subsubsection{Anzahl Bits}
+\subsubsection{Anzahl Bit}
 \label{subsub:Nulldurchgänge}
-%\textcolor{red}{Anzahl bits mit Startdelimiter erkennen. Als erstes alle werte zwischen 0 und -1V gelöscht, weil Idle. Dann wurde eine Flanke detektiert. Wenn eine Flanke detektier um 30 Werte vorwärts springen (damit zweite Flange nicht nochmals erkennt wird (manchester encodiertes Signal)}
-In diesem Schritt wurde mit Matlab versucht, die Anzahl Bits zu aus der Messung auszuwerten. Gemäss Kapitel \ref{sub:BitEncoding} gibt es für den Wert "'0"' und "'1"' jeweils einen Flankenwechsel in der Hälfte der Bitdauern (BT, gemäss Kapitel \ref{sub:GeschwindigkeitDatenbus}: 1 BT = 666 ns). Dies kann verwendet werden um die Anzahl Bits herauszufinden. Anhand Abbildung \ref{fig:Suchalgo_Bits} kann der gewählte Suchalgorithmus erklärt werden.
+%\textcolor{red}{Anzahl bit mit Start-Delimiter erkennen. Als erstes alle werte zwischen 0 und -1V gelöscht, weil Idle. Dann wurde eine Flanke detektiert. Wenn eine Flanke detektier um 30 Werte vorwärts springen (damit zweite Flange nicht nochmals erkennt wird (manchester encodiertes Signal)}
+In diesem Schritt wurde mit Matlab versucht, die Anzahl Bit zu aus der Messung auszuwerten. Gemäss Kapitel \ref{sub:BitEncoding} gibt es für den Wert "'0"' und "'1"' jeweils einen Flankenwechsel in der Hälfte der Bitdauern (BT, gemäss Kapitel \ref{sub:GeschwindigkeitDatenbus}: 1 BT = 666 ns). Dies kann verwendet werden um die Anzahl Bit herauszufinden. Anhand Abbildung \ref{fig:Suchalgo_Bits} kann der gewählte Suchalgorithmus erklärt werden.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Figures/Chap3/Busauslastung/Suchalgorithmus_Bits.png}
-    \caption{Suchalgorithmus der Bits in einem Manchester encodierten Signal}
+    \caption{Suchalgorithmus der Bit in einem Manchester encodierten Signal}
     \label{fig:Suchalgo_Bits}
 \end{figure}
 
-X steht für eine zufällige Zeit innerhalb einer Transaktion am Anfang eines Manchester Bits. Auf der Abszisse ist die Zeit in Bitdauer aufgetragen. Auf der Ordinate ist ein Beispielsignal und die Decodierung des Signals aufgezeigt. Da in der Mitte der Bitdauer eine Flanke zu erwarten ist, wird auch eine halbe Bitdauer vor X eine Flanke erwartet. Dies bildet den Einstieg. Wird eine Flanke detektiert, wird um eine Bitdauer von 0.75 positiv in der Zeit gesprungen. Der Sprungpfeil zeigt mit seinem flachen Ende, ab wo die nächste Flanke gesucht wird. Der Sprung erfolgt, weil Flankendetektionen wie bei \textit{x+1} in Abbildung\ref{fig:Suchalgo_Bits},  nicht berücksichtigt werden, da diese die Auswertung verfälschen.
+X steht für eine zufällige Zeit innerhalb einer Transaktion am Anfang eines Manchester Bit. Auf der Abszisse ist die Zeit in Bitdauer aufgetragen. Auf der Ordinate ist ein Beispielsignal und die Decodierung des Signals aufgezeigt. Da in der Mitte der Bitdauer eine Flanke zu erwarten ist, wird auch eine halbe Bitdauer vor X eine Flanke erwartet. Dies bildet den Einstieg. Wird eine Flanke detektiert, wird um eine Bitdauer von 0.75 positiv in der Zeit gesprungen. Der Sprungpfeil zeigt mit seinem flachen Ende, ab wo die nächste Flanke gesucht wird. Der Sprung erfolgt, weil Flankendetektionen wie bei \textit{x+1} in Abbildung\ref{fig:Suchalgo_Bits},  nicht berücksichtigt werden, da diese die Auswertung verfälschen.
 
-Gemäss Anhang \ref{app:Flankenerkennung Bits} sind die Anzahl Flanken, welche in einem Master Startdelimiter und einem Slave Startdelimiter gezählt werden gleich Sieben.
+Gemäss Anhang \ref{app:Flankenerkennung Bits} sind die Anzahl Flanken, welche in einem Master Start-Delimiter und einem Slave Start-Delimiter gezählt werden gleich Sieben.
 
-Für die Auswertung am MVB Signal wurde in einem ersten Schritt das Idle Signal, also alle Messpunkte zwischen -0.5 V und -1 V aus dem Signal entfernt. Daraus folgt ein Signal,  welches Startbits, Startdelimiter, Masterframe- sowie Slaveframe-Daten enthält. In Abbildung \ref{fig:ReineDaten}ist ein Vergleich zwischen beiden Signalen zu sehen: oben mit Idle Signal, unten ohne Idle Signal. Die Idle Zeit macht somit 75 \% aus. 
+Für die Auswertung am MVB Signal wurde in einem ersten Schritt das Idle Signal, also alle Messpunkte zwischen -0.5 V und -1 V aus dem Signal entfernt. Daraus folgt ein Signal,  welches Startbit, Start-Delimiter, Master-Frame sowie Slave-Frame-Daten enthält. In Abbildung \ref{fig:ReineDaten}ist ein Vergleich zwischen beiden Signalen zu sehen: oben mit Idle Signal, unten ohne Idle Signal. Die Idle Zeit macht somit 75 \% aus. 
 
 \begin{figure}[H]
     \centering
@@ -87,11 +87,11 @@ Für die Auswertung am MVB Signal wurde in einem ersten Schritt das Idle Signal,
     \label{fig:ReineDaten}
 \end{figure}
 
-Der Suchalgorithmus wurde auf die Daten angewendet und die Anzahl Bits gezählt.
+Der Suchalgorithmus wurde auf die Daten angewendet und die Anzahl Bit gezählt.
 
 \subsubsection{Auswertung effektive Nutzdaten}
 %\textcolor{red}{Effektive = Anzahl Nuldurchgänge - (Delimiert * 9); Tablle effiktive Nutzwerte mit und ohne DDS.}
-Anschliessend wird ausgewertet, wie viele Bits an effektivem Payload innerhalb einer Zeitdauer von 20 ms geschickt werden. Anhand Formel \ref{equ:effektivBPS} kann dies  für jede der 25 Messungen unter Normallast und unter Volllast berechnet werden.  Der dazugehörige Code ist in Anhang \textcolor{red}{\ref{XX}} zu finden.
+Anschliessend wird ausgewertet, wie viele Bit an effektivem Payload innerhalb einer Zeitdauer von 20 ms geschickt werden. Anhand Formel \ref{equ:effektivBPS} kann dies  für jede der 25 Messungen unter Normallast und unter Volllast berechnet werden.  Der dazugehörige Code ist in Anhang \textcolor{red}{\ref{XX}} zu finden.
 
 \begin{equation}
     eff\_bps = (NumBit - (NumDelimiter * 7)) / 0.02
@@ -104,7 +104,7 @@ Anschliessend wird ausgewertet, wie viele Bits an effektivem Payload innerhalb e
 \begin{table}[H]
     \centering
     \begin{tabular}{r|c|c|c}
-        & min in Bits/s & mean in Bits/s & max in Bits/s\\ 
+        & min in Bit/s & mean in Bit/s & max in Bit/s\\ 
         \hline
         Normallast & 2.4705e+05 & 2.8823e+05 & 3.1885e+05\\
         \hline
@@ -114,8 +114,8 @@ Anschliessend wird ausgewertet, wie viele Bits an effektivem Payload innerhalb e
     \label{tab:Busauslastung}
 \end{table}
 
-Dies bestätigt sich aus Abbildung \ref{fig:ReineDaten}, wo das Signal ohne Idle Zeit nur noch ungefähr 0.005 s lang ist. 0.005 s/0.02 s = 0.25  also 25 \% und 0.25*1.5 MBits/s sind 375 kBits/s. 
+Dies bestätigt sich aus Abbildung \ref{fig:ReineDaten}, wo das Signal ohne Idle Zeit nur noch ungefähr 0.005 s lang ist. 0.005 s/0.02 s = 0.25  also 25 \% und 0.25*1.5 MBit/s sind 375 kBit/s. 
 
-Gemäss einer Internetsuche ist es mit der Data Length Extension (DLE) und dem 2 MBits/s physikalischen Layer (PHY) möglich, bis zu 992.07 kBits/s an Datendurchsatz zu erlangen. Dies bei einem Datenaustausch von 247 Bytes. Der Wert mit der DLE und dem 1 MPHY liegt bei 400 kBits/s mit 158 Bytes an Daten. Beide Tests wurden in einem Connection Interval von 7.5 Millisekunden durchgeführt. 
+Gemäss einer Internetsuche ist es mit der Data Length Extension (DLE) und dem 2 MBit/s physikalischen Layer (PHY) möglich, bis zu 992.07 kBit/s an Datendurchsatz zu erlangen. Dies bei einem Datenaustausch von 247 Bytes. Der Wert mit der DLE und dem 1 MPHY liegt bei 400 kBit/s mit 158 Bytes an Daten. Beide Tests wurden in einem Connection Interval von 7.5 Millisekunden durchgeführt. 
 Gemäss der Internetsuche sollte es also möglich sein, den vollen Rohdatenstream über Bluetooth zu senden. 
 

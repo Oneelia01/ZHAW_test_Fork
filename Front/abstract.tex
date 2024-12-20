@@ -7,7 +7,15 @@
 
 \begin{abstract}
 %\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
+Die Schweizerischen Bundesbahnen (SBB) setzen Züge ein, die den Multifunction Vehicle Bus (MVB) zur Kommunikation zwischen verschiedenen Systemen nutzen. Ziel dieser Arbeit war die Entwicklung eines MVB-Sniffers, der es ermöglicht, den MVB-Datenverkehr zu erfassen und zu analysieren.
 
+Für die Umsetzung wurde ein Transceiver, ein FPGA sowie ein Mikrocontroller ausgewählt. Der Entwicklungsprozess wurde auf Basis von Evaluationsboards gestartet. Auf einem Zug wurde eine MVB-Datenaufzeichnung durchgeführt, um den Datenverkehr zu charakterisieren und später den Aufbau und die Firmware der Evaluationsboards zu überprüfen. Der Transceiver führt die beiden MVB-Signale zusammen, die dann vom FPGA abgetastet und dekodiert werden. Anschliessend wird der Bitstream an den Mikrocontroller übertragen, der die MVB-Daten in Telegramme verpackt und per Bluetooth ausgibt. Parallel dazu wurde ein Schaltplan für den MVB-Sniffer erstellt, welcher das Hardware-Design vereint.
+
+Die Tests zur Datenauswertung und -übertragung im FPGA zeigten zuverlässige Ergebnisse in verschiedenen Szenarien. Die Abtast und Auswertelogik vom FPGA funktioniert robust und fehlerfrei. Allerdings zeigt der Versuchsaufbau seine Probleme. Die SPI-Kommunikation zwischen dem FPGA und dem Mikrocontroller funktioniert nicht mit der Datenrate des realen MVB. Die Kommunikation ist nur stabil, wenn die Sendepausenzeit auf dem Bus künstlich verlängert wird.
+
+Die SPI-Schnittstelle des gewählten Mikrocontrollers ist ungeeignet, um die volle Datenrate des MVB vom FPGA zu empfangen, da sie keine Hardware SPI Peripherie bietet. Somit kommt es zu fehlerhaften Transaktionen, welche vom Mikrocontroller falsch verarbeitet werden. Ebenfalls ist die Daten Integrität des FPGA Buffer noch nicht gegeben, wodurch falsche Transaktionen ausgeführt werden.
+
+Obwohl der Versuchsaufbau noch nicht die volle Busauslastung verarbeiten kann, resultiert eine Vielzahl von wichtigen Erkenntnissen aus dieser Arbeit. Für eine Weiterentwicklung des MVB-Sniffers erscheint es sinnvoll, den Mikrocontroller zu wechseln zu einem mit echter Hardware SPI-Peripherie, sowie den bestehenden Buffer des FPGA zu optimieren und einen zusätzlichen einzuführen.
 
 \end{abstract}
 
@@ -18,19 +26,15 @@
 \renewcommand{\extraabstractname}{Abstract} % muss hier bleiben, sonst ist der Titel "Zusammenfassung", weil auf Deutsch gewechselt
 \begin{extraAbstract}
 %\addchaptertocentry{\extraabstractname} % Add the abstract to the table of contents
+The Swiss Federal Railways (SBB) use trains that utilise the Multifunction Vehicle Bus (MVB) for communication between different systems. The aim of this work was to develop an MVB sniffer that makes it possible to record and analyse MVB data traffic.
 
+A transceiver, an FPGA and a microcontroller were selected for the implementation. The development process was started on the basis of evaluation boards. MVB data recording was carried out on a train in order to characterise the data traffic and later check the structure and firmware of the evaluation boards. The transceiver merges the two MVB signals, which are then sampled and decoded by the FPGA. The bitstream is then transmitted to the microcontroller, which packages the MVB data into telegrams and outputs them via Bluetooth. At the same time, a circuit diagram for the MVB sniffer was created, which combines the hardware design.
 
+The tests for data evaluation and transmission in the FPGA showed reliable results in various scenarios. The FPGA's sampling and evaluation logic works robustly and without errors. However, the test setup shows its problems. The SPI communication between the FPGA and the microcontroller does not work at the data rate of the real MVB. Communication is only stable if the transmission pause time on the bus is artificially extended.
 
+The SPI interface of the selected microcontroller is unsuitable for receiving the full data rate of the MVB from the FPGA, as it does not offer any hardware SPI peripherals. This results in incorrect transactions, which are processed incorrectly by the microcontroller. Also, the data integrity of the FPGA buffer is not yet given, resulting in incorrect transactions being executed.
 
-
-Ganzer Bericht in Kompatker form
-
-Hintergrund / Problemstellung:
-Ziel der arbeid
-Methodik - Eval board
-Wichtige Ergebnisse: Aller Wichtigste Zahlen
-schlussfolgerung: Reflexion, was beduetet das
-1/2 - 3/4 Seite ist okay
+Although the test setup is not yet able to process the full bus utilisation, a number of important findings have resulted from this work. For further development of the MVB sniffer, it seems sensible to change the microcontroller to one with real hardware SPI peripherals, as well as to optimise the existing FPGA buffer and introduce an additional one.
 
 \end{extraAbstract}
 

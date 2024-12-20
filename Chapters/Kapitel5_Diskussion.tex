@@ -60,11 +60,11 @@ Die Abbildungen \ref{fig:ReakKurz} und \ref{fig:ReakLang} zeigen, dass die Reakt
 
 Diese Zeit lässt sich mit der Erklärung in der Slave Driver API Reference erklären. Die nachfolgende Erklärung wurde aus dem englischen Übersetzt: 
 
-\textit{Die ESP32-S3 SPI-Slave Peripherie ist als "'general purpose Device"' entwickelt und wird von der CPU gesteuert. [...] Alle Transaktionen müssen von der CPU durchgeführt werden, was bedeutet, dass das Senden und Empfangen nicht Echtzeit stattfinden und vielleicht bemerkbare Latenz vorhanden sind.}
+\textit{Die ESP32-S3 SPI-Slave Peripherie ist als "'general purpose Device"' entwickelt und wird von der CPU gesteuert. [...] Alle Transaktionen müssen von der CPU durchgeführt werden, was bedeutet, dass das Senden und Empfangen nicht Echtzeit stattfinden und vielleicht bemerkbare Latenz vorhanden sind.} \cite{SPI_SLAVE_DRIVER_API}
 
 Dies schränkt die Nutzbarkeit der SPI-Peripherie ein. Die Transaktionslänge hängt zudem nicht mit dieser Zeit zusammen. Vergleichbare Zeiten wurden ebenfalls bei 16 oder 32 Bit an Daten gemessen. 
 
-Die Back-to-Receive-Zeit (BTR-Zeit) entspricht einem akzeptablen Wert von 12 $\mu$s. Da jede 24 $\mu$s ein neues 64-Bit Paket empfangen wird, hat die SPI-Peripherie genug Zeit, um auch bei grösserer Auslastung zu funktionieren. Eine Verkürzung der Übertragungspakete auf 32-Bit ist nicht sinnvoll, da 32-Bit Pakete jede 12 $\mu$s empfangen werden müssten und das kann nicht gewährleistet werden. 
+Die Back-to-Receive-Zeit (BTR-Zeit) entspricht einem akzeptablen Wert von 12 $\mu$s. Da jede 24 $\mu$s ein neues 64-Bit Paket empfangen wird, hat die SPI-Peripherie genug Zeit, um auch bei grösserer Auslastung zu funktionieren. Eine Verkürzung der Übertragungspakete auf 32-Bit ist nicht sinnvoll, da 32-Bit Pakete jede 12 $\mu$s empfangen werden müssten und das nicht gewährleistet werden kann. 
 
 \section{Übertragung SPI}
 \label{sec:DiskussionÜbertragungSPI}
@@ -78,12 +78,29 @@ Die Busauslastung war im Test nicht repräsentativ für reale Szenarien, weshalb
 Zusammenfassend arbeitet das System stabil und erfüllt die Anforderungen bei der Verarbeitung der Daten, vorbehaltlich der Ergebnisse des Stresstests.
 
 \section{Stressteset SPI-Übertragung}
+\label{sec:DiskStresstest}
+Die Messungen wurden jeweils ungefähr 20-30 Sekunde durchgeführt. Der Stresstest hat gezeigt, dass die Belastungsgrenze zwischen 25 ms und 12.5 ms liegen muss. 
 
-\section{Hardware Design}
-\label{sec:DiskussionHardware}
+In Abbildung \ref{fig:Stress50} und Abbildung \ref{fig:Stress25} sind mehrheitlich vier verschiedene Telegramme zu sehen, welche empfangen werden. Die vier meist empfangenen Telegramme sind die erwarteten Telegramme.
 
-Der
-Weshalb bin ich nicht weiter gekommen? Weshalb ist kein PCB bestellt worden?
+Ab der Messung bei 12.5 ms (Abbildung \ref{fig:Stress12_5}) wird die Fehlerquote grösser. Viele Werte wurden nur 1 - 20 Mal empfangen, was darauf hindeutet, dass einzelne Fehler in den Telegrammen passiert sind. Die vier meist empfangenen Telegramme sind jedoch die erwarteten Telegramme.
+
+
+Bei der Messung mit einem Triggerintervall von 1 ms (Abbildung \ref{fig:Stress1}) ist die Differenz noch grösser. Jedoch auch hier sind die vier meist empfangenen Telegramme die Erwarteten. Hier aber mit einer grösseren Differenz als sonst. Die Telegrammnummer 4 wurde vermutlich am meisten übertragen, weil dies lediglich eine SPI-Transaktion von 32 Nutzdatenbits benötigt, welche alle auf einmal übertragen werden. 
+
+Was aus dieser Messung nicht gesehen werden kann, ist, an welcher Stelle die Fehler in den Telegrammen entstehen und dafür sind folgende Orte möglich:
+\begin{itemize}[]
+    \item Die Daten werden vom FPGA falsch über SPI versendet
+    \item Die hohe Frequenz an SPI-Transaktionen kann vom ESP32-S3 nicht verarbeitet werden
+    \item Die Daten werden Firmware intern nicht integer behandelt und Buffer werden überschrieben.
+    \item Der ESP32-S3 schickt die Daten nicht korrekt.
+    \item Das Python Script ist nicht leistungsfähig genug, die hohe Frequenz an Daten korrekt entgegenzunehmen
+\end{itemize}
+
+Zudem kann auch nicht genau gesagt werden, wie viele Trigger über den Zeitraum der Messung aufgetreten sind.
+
+Aufgrund fehlender Zeit kann dies nicht mehr weiterverfolgt und gemessen werden. Da bereits beim FPGA Übertragungsprobleme bei höherer Busauslastung erkannt wurden (siehe Kapitel \ref{sec:DiskussionHardwareFPGA}) und die in der Firmware verwendeten Buffer nicht durch Semaphore oder Mutex geschützt sind, könnte auch eine Kombination aus den oben genannten Problemen zu dem Fehlerbild bei 1 ms Triggerintervall in Abbildung \ref{fig:Stress1} führen.
+
 
 \section{Prototyp Sniffer}
 \label{sec:DiskussionSniffer}

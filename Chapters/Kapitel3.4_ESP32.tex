@@ -21,7 +21,7 @@ In Abbildung \ref{fig:FSMEinleitung} ist der Aufbau der Firmware grobschematisch
 %\textcolor{red}{Wie wurde das FreeRTOS benutzt, um die Zeitkritische Aufgaben zu lösen? Welche Tasks und welche FSM arbeiten in den jeweiligen Cores?}
 
 
-Für dieses Projekt kam FreeRTOS zum Einsatz, das bereits in der ESP-IDF, der Entwicklungsumgebung für den ESP32-S3, integriert ist. In diesem Abschnitt werden die Umsetzung des Betriebssystems und die genutzten FreeRTOS-Elemente beschrieben, um den Betrieb zu ermöglichen.
+Für dieses Projekt kam FreeRTOS zum Einsatz, das bereits in der ESP-IDF, der Entwicklungsumgebung für den ESP32-S3, integriert ist. \cite{FREERTOS_IDF_API} In diesem Abschnitt werden die Umsetzung des Betriebssystems und die genutzten FreeRTOS-Elemente beschrieben, um den Betrieb zu ermöglichen.
 
 \subsubsection{Task}
 Es werden Task definiert, welche von einem Scheduler anschliessend gemanaged und aufgerufen werden. Für die Ausführung der Hauptaufgaben auf dem Sniffer wurden 3 Tasks gemäss Tabelle \ref{tab:TaskDefinitonen} definiert.
@@ -52,7 +52,7 @@ Der Task \textit{spi\_receive} und \textit{mvb\_manch\_decode} erhalten beide ei
 
 \subsubsection{Queue}
 \label{subsub:Queue}
-Für den primären Datenaustausch zwischen den Tasks werden Queues verwendet. Wenn ein Task von einer leeren Queue lesen will, wird dieser in den \textit{blocking-state} versetzt. Dadruch gibt dieser Task die CPU frei und wird erst wieder aufgerufen, wenn sich ein Element in der Queue befindet.
+Für den primären Datenaustausch zwischen den Tasks werden Queues verwendet. Wenn ein Task von einer leeren Queue lesen will, wird dieser in den \textit{blocking-state} versetzt. Dadruch gibt dieser Task die CPU frei und wird erst wieder aufgerufen, wenn sich ein Element in der Queue befindet.\cite{FREERTOS_QUEUE}
 
 Für die Intertask-Kommunikation wurden zwei Queue definiert. In Abbildung \ref{fig:QueueSchema} ist eine schematische Darstellung des Datenflusses gezeigt.
 
@@ -64,9 +64,9 @@ Für die Intertask-Kommunikation wurden zwei Queue definiert. In Abbildung \ref{
     \label{fig:QueueSchema}
 \end{figure}
 
-Die \textit{spi\_queue} fasst 64 Werte à 16 Bit. Die Wahl von 16 Bit basiert auf der Verarbeitung durch den Task \textit{mvb\_manch\_decode}. Die Größe von 64 wurde gewählt, dass ein möglichst grosser Buffer ansteht und keine Daten verloren gehen können.
+Die \textit{spi\_queue} fasst 64 Werte à 16 Bit. Die Wahl von 16 Bit basiert auf der Verarbeitung durch den Task \textit{mvb\_manch\_decode}. Die Grösse von 64 wurde gewählt, dass ein möglichst grosser Buffer ansteht und keine Daten verloren gehen können.
 
-Die \textit{ble\_queue} fasst acht Pointer auf \textit{struct telegramm}. Pointer werden verwendet, da sie mit 4 Bytes deutlich speichereffizienter sind als das 40-Byte-große \textit{struct}. Die Grösse acht entspricht dem in Kapitel \ref{subsub:DataTelegramm} erstellten Arrays. So wird sichergestellt, dass Werte in der Queue nicht überschrieben werden, bevor sie über Bluetooth übertragen werden.
+Die \textit{ble\_queue} fasst acht Pointer auf \textit{struct telegramm}. Pointer werden verwendet, da sie mit 4 Bytes deutlich speichereffizienter sind als das 40-Byte-grosse \textit{struct}. Die Grösse acht entspricht dem in Kapitel \ref{subsub:DataTelegramm} erstellten Arrays. So wird sichergestellt, dass Werte in der Queue nicht überschrieben werden, bevor sie über Bluetooth übertragen werden.
 
 \subsection{Global verwendete Datenstrukturen}
 \label{sub:GlobalDtatStruct}
@@ -80,9 +80,9 @@ Für das Zusammensetzten der Telegramme wurde nachfolgendes \textit{struct} in C
 typedef struct telegramm
 {
     uint8_t metadata;       // Fehler im Telegramm (Bsp 0x01: Nur Master-Frame)
-    uint8_t data_m[2];      // Master Frame Daten
+    uint8_t data_m[2];      // Master-Frame Daten
     uint8_t check_m;        // Master Check Sequenz
-    uint8_t data_s[32];     // Slave Frame Daten eines 256 Bit
+    uint8_t data_s[32];     // Slave-Frame Daten eines 256 Bit
     uint8_t check_s[4];     // Slave Check Squenzen
 } telegramm;
 \end{lstlisting}
@@ -131,7 +131,7 @@ Die Union wird nur vom Task \textit{spi\_receive} verwendet. Die Verwendung wird
 
 \subsection{Task - SPI Receive}
 \label{sub:TaskSPIReceive}
-Der ESP32-S3 verfügt über eine SPI-Schnittstelle, die für den Empfang von Daten verwendet wird. Im Rahmen dieses Projekts wurde ein 3-Buffer-System implementiert, basierend auf einem Beitrag, um die Datenverwaltung effizient zu gestalten. 
+Der ESP32-S3 verfügt über eine SPI-Schnittstelle, die für den Empfang von Daten verwendet wird. Im Rahmen dieses Projekts wurde ein 4-Buffer-System implementiert, basierend auf einem Beitrag\cite{ESP_FORUM_SPI_BUFFER}, um die Datenverwaltung effizient zu gestalten. 4 wurden gewählt, weil dies in Tests die geringste Anzahl Fehltransaktionen zeigte.
 
 Zusätzlich wurde ein Handshake-Pin integriert, der in einem Callback sowohl während der Initialisierung (\textit{setup}) als auch nach der Transaktion verwendet wird. Ein High-Signal (1) signalisiert, dass der SPI-Empfänger aufnahmebereit ist, während ein Low-Signal (0) anzeigt, dass sich der Empfänger in der Verarbeitung befindet.
 
@@ -168,7 +168,7 @@ void spi_receive(void *pvParameters)
         } 
         else if
         {
-        // ...
+        // ... Weitere Receive Buffer
         }
         else
         {
@@ -190,24 +190,24 @@ void spi_receive(void *pvParameters)
 \subsection{Task - Decodierung Manchester Signal}
 \label{sub:MvbManchDecode}
 %\textcolor{red}{Hier wird erklärt, wie die Statemachine für die Decodierung des Manchester Encodierten Signals Verwendet wurde. }
-Gemäss Kapitel \ref{sec:HardwareFPGA} werden jeweils acht Nutzdatenbits als 16bit Werten transferiert. Dies um Manchester-Violations zu erkennen, die im Master- und Slave Start Delimiter vorhanden sind (siehe Kapitel \ref{sub:StartDelimiter}). Die State Machine verarbeitet pro Durchlauf je acht Nutzdatenbits. Bei einer SPI-Transaktion werden jeweils 32 Nutzdatenbits übertragen. Das bedeutet, dass nach einer Übertragung jeweils vier neue Werte in der spi\_queue vorhanden sind, welche bearbeitet werden. 
+Gemäss Kapitel \ref{sec:HardwareFPGA} werden jeweils acht Nutzdatenbits als 16bit Werten transferiert. Dies um Manchester-Violations zu erkennen, die im Master- und Slave Start-Delimiter vorhanden sind (siehe Kapitel \ref{sub:StartDelimiter}). Die State Machine verarbeitet pro Durchlauf je acht Nutzdatenbits. Bei einer SPI-Transaktion werden jeweils 32 Nutzdatenbits übertragen. Das bedeutet, dass nach einer Übertragung jeweils vier neue Werte in der spi\_queue vorhanden sind, welche bearbeitet werden. 
 
 Zur Zusammensetzung der Telegramme wurde eine Statemachine implementiert, da die Reihenfolge der Telegramme auf dem Datenbus ideal für dieses Konzept ist. Eine grafische Darstellung der Statemachine findet sich im Ablaufdiagramm im Anhang \ref{app:ManchDec}.
 
 Gemäss Kapitel \ref{sub:MasterSlavePrinzip} wird ein Telegamm in zwei Schritten auf dem Bus gesendet. Als Erstes wird ein Master-Frame mit einer gleichbleibenden Länge von 32 Nutzdatenbits versendet. Die Länge des darauffolgenden Slave-Frames variiert zwischen einer Länge von 32 - 296 Nutzdatenbits.
 
-Damit der Prozess eines Telegramms gestartet werden kann, muss zuest das Master Start Delimiter (gemäss Kapitel \ref{sub:StartDelimiter}) erkennt werden. Dies erfolgt anhand der hexadezimalen Repräsentation des Wertes für den Startdelimiter und lautet 0xC715. Wird ein solcher Wert erkennt, müssen die Daten der nächsten drei Transaktionen den Master-Frame-Daten und der Master-Checksequenz entsprechen.
+Damit der Prozess eines Telegramms gestartet werden kann, muss zuest das Master Start-Delimiter (gemäss Kapitel \ref{sub:StartDelimiter}) erkennt werden. Dies erfolgt anhand der hexadezimalen Repräsentation des Wertes für den Start-Delimiter und lautet 0xC715. Wird ein solcher Wert erkennt, müssen die Daten der nächsten drei Transaktionen den Master-Frame-Daten und der Master-Checksequenz entsprechen.
 
 Nach dem Master-Frame folgt das Slave-Frame, sofern dieses sendefähig ist und sich angesprochen fühlt. Auf die gleiche Weise wie vorhin wird der empfangende Wert auf seine hexadezimale Repräsentation überprüft. Diese lautet 0xA8E3. Wird diese nicht erkennt, kann dies folgende zwei Gründe haben:
 
 \begin{enumerate}
-    \item Anstelle des Slave Start Delimiters wurde ein Master Start Delimtier geschickt. Dies passiert, wenn der Slave Teilnehmer aktuell nicht bereit zu senden ist. 
-    \item Es ist weder ein Master- noch ein Slave Start Delimiter. Daten sind verloren gegangen, jedoch kann nicht zurückgeführt werden, wie viele.
+    \item Anstelle des Slave Start-Delimiters wurde ein Master Start Delimtier geschickt. Dies passiert, wenn der Slave Teilnehmer aktuell nicht bereit zu senden ist. 
+    \item Es ist weder ein Master- noch ein Slave Start-Delimiter. Daten sind verloren gegangen, jedoch kann nicht zurückgeführt werden, wie viele.
 \end{enumerate}
 
 In beiden Fällen wird das aktuelle Telegramm abgebrochen und mit einem entsprechenden Error Code über die ble\_queue (siehe Kapitel \ref{subsub:Queue}) an den Task bt\_send übermittelt. 
 
-Wird der Slave Start Delimiter erkannt, werden die Slave-Daten und Checksequenzen empfangen. Abbildung \ref{fig:SlaveFrameFormat} zeigt die übertragbaren Nutzdatenbits pro Frame-Größe. Beispielsweise werden bei einem Frame mit 128 Nutzdatenbits in 8-Bit-Schritten verarbeitet: Zuerst 64 Nutzdatenbits in 8 Zyklen, gefolgt von einer separaten Checksumme. Anschließend folgen weitere 64 Nutzdatenbits und eine abschließende Checksumme. Der untenstehende Code zeigt die Implementierung in C. Die Variabel \textit{slave\_data\_loop} in der Zeile 8 und \textit{slave\_check\_loop} in Zeile 29 definieren dabei die Anzahl Zyklen und werden im vorherigen Schritt \textit{Slave Start} gemäss Tabelle \ref{tab:SchlaufenSlaveLoops} gesetzt. 
+Wird der Slave Start-Delimiter erkannt, werden die Slave-Daten und Checksequenzen empfangen. Abbildung \ref{fig:SlaveFrameFormat} zeigt die übertragbaren Nutzdatenbits pro Frame-Grösse. Beispielsweise werden bei einem Frame mit 128 Nutzdatenbits in 8-Bit-Schritten verarbeitet: Zuerst 64 Nutzdatenbits in 8 Zyklen, gefolgt von einer separaten Checksumme. Anschliessend folgen weitere 64 Nutzdatenbits und eine abschliessende Checksumme. Der untenstehende Code zeigt die Implementierung in C. Die Variabel \textit{slave\_data\_loop} in der Zeile 8 und \textit{slave\_check\_loop} in Zeile 29 definieren dabei die Anzahl Zyklen und werden im vorherigen Schritt \textit{Slave Start} gemäss Tabelle \ref{tab:SchlaufenSlaveLoops} gesetzt. 
 
 Ist die Bedingung in Zeile 29 \textit{false} wird der aktuelle Pointer auf das Telegramm über die ble\_queue dem Task bt\_send übergeben. 
 
@@ -311,7 +311,7 @@ Dieser Task nutzt die Mechanismen von FreeRTOS und die Funktionen des BLE-Stacks
 \subsection{Bluetooth GATT-Server}
 \label{sub:BluetoothGATT}
 %\textcolor{red}{Wie wurde der Bluetooth Gatt-Server aufgebaut. Erklärung Charakteristiken}
-Auf dem ESP32-S3 stehen zwei Bluetooth Low Energy Host Systeme zur Verfügung. Der BluFi-Host sowie der NimBle-Host. Für dieses Projekt wurde der NimBle-Host verwendet, da es gut dokumentiert ist und Beispielcode zur Verfügung stehen.
+Auf dem ESP32-S3 stehen zwei Bluetooth Low Energy Host Systeme zur Verfügung. Der BluFi-Host sowie der NimBle-Host\cite{BLUETOOTH_API}. Für dieses Projekt wurde der NimBle-Host verwendet, da es gut dokumentiert ist und Beispielcode zur Verfügung stehen.
 
 In Abbildung \ref{fig:BLEGATT} ist eine grafische Darstellung des Generic Attrubute Profile (GATT) Servers zu sehen.
 

@@ -31,19 +31,19 @@ Es wird erwartet dass die Daten, wie diese in der Tabelle \ref{tab:frame_data} z
         \toprule
         \textbf{Frame Type} & \textbf{Data}  & \textbf{Payload} \\ 
         \midrule
-        Master Frame 1 & 0xC715’569A’6555’99A6 & 0x1B'40'AD \\
-        Slave Frame 1  & 0xA8E3’5565’9A65’AAAA’AAAA’6A66 & 0x04'B4'FF'FF'75 \\
+        Master-Frame 1 & 0xC715’569A’6555’99A6 & 0x1B'40'AD \\
+        Slave-Frame 1  & 0xA8E3’5565’9A65’AAAA’AAAA’6A66 & 0x04'B4'FF'FF'75 \\
         \midrule
-        Master Frame 2 & 0xC715’5595’6955’A9AA & 0x08'60'EF \\
-        Slave Frame 2  & 0xA8E3’5555’5555’AAAA & 0x00'00'FF\\
+        Master-Frame 2 & 0xC715’5595’6955’A9AA & 0x08'60'EF \\
+        Slave-Frame 2  & 0xA8E3’5555’5555’AAAA & 0x00'00'FF\\
         \midrule
-        Master Frame 3 & 0xC715’5699’5A55’6AAA & 0x1A'30'7F \\
-        Slave Frame 3  & 0xA8E3’5565’A996’AAAA’AAAA’A569 & 0x04'E9'FF'FF'C6 \\
+        Master-Frame 3 & 0xC715’5699’5A55’6AAA & 0x1A'30'7F \\
+        Slave-Frame 3  & 0xA8E3’5565’A996’AAAA’AAAA’A569 & 0x04'E9'FF'FF'C6 \\
         \midrule
-        Master Frame 4 & 0xC715’9656’5655’6AA9 & 0x91'10'7E\\
+        Master-Frame 4 & 0xC715’9656’5655’6AA9 & 0x91'10'7E\\
         \bottomrule
     \end{tabular}
-    \caption{Master and Slave Frame Data}
+    \caption{Master and Slave-Frame Data}
     \label{tab:frame_data}
 \end{table}
 
@@ -53,7 +53,7 @@ Es wird erwartet dass die Daten, wie diese in der Tabelle \ref{tab:frame_data} z
 \subsection{ESP32 SPI und Statemachine Test}
 \label{sub:ESPSPIundFSMTest}
 
-Für die Verifikation der Firmware auf dem ESP32-S3 wurde ein zweites Gerät, welches als SPI-Master den FPGA simulieren soll, verwendet. Die Hardware, welche als SPI Master verwendet wurde, war ein ESP32. Dies aus dem Grund, weil bereits Erfahrungen mit dem ESP32 vorhanden waren und das Aufsetzen des Gerätes, sowie das Ausgeben von Daten über die SPI schnell realisiert werden konnten. In Abbildung \ref{fig:TestszenarioESP32} ist der schematische Aufbau zu sehen. Es wurden die Verbindungen für die SPI-Leitungen und GND verbunden. Auf einem Laptop wurde die Open-Source-Software Bluetility, ein Tool für Bluetooth Low Energy, verwendet. Mit dieser Anwendung können Geräte gescannt, deren Dienste und Eigenschaften durchsucht, sowie Werte gelesen, geschrieben und abonniert werden. Gemäss Kapitel \ref{sub:BluetoothGATT} wurden die Daten in der Charakteristik mit der roten Zahl 1 empfangen. Zusätzlich wird die Reaktionszeit beim Empfangen der SPI-Daten gemessen. Dies wird durch das Vergleichen der Chip Select-Leitung und der Handshakeleitung \textcolor{red}{berechnet.?} 
+Für die Verifikation der Firmware auf dem ESP32-S3 wurde ein zweites Gerät, welches als SPI-Master den FPGA simulieren soll, verwendet. Die Hardware, welche als SPI Master verwendet wurde, war ein ESP32. Dies aus dem Grund, weil bereits Erfahrungen mit dem ESP32 vorhanden waren und das Aufsetzen des Gerätes, sowie das Ausgeben von Daten über die SPI schnell realisiert werden konnten. In Abbildung \ref{fig:TestszenarioESP32} ist der schematische Aufbau zu sehen. Es wurden die Verbindungen für die SPI-Leitungen und GND verbunden. Auf einem Laptop wurde die Open-Source-Software Bluetility\cite{BLUETILITY_APPLICATION}, ein Tool für Bluetooth Low Energy, verwendet. Mit dieser Anwendung können Geräte gescannt, deren Dienste und Eigenschaften durchsucht, sowie Werte gelesen, geschrieben und abonniert werden. Gemäss Kapitel \ref{sub:BluetoothGATT} wurden die Daten in der Charakteristik mit der roten Zahl 1 empfangen. Zusätzlich wird die Reaktionszeit beim Empfangen der SPI-Daten gemessen. Dies wird durch das Vergleichen der Chip Select-Leitung und der Handshakeleitung \textcolor{red}{berechnet.?} 
 
 \begin{figure}[H]
     \centering
@@ -121,7 +121,7 @@ Mit ChatGPT wurde ein Python Script geschrieben, welches auf die Charakteristik 
 
 Es werden genau vier unterschiedliche Telegramme erwartet. Diese werden in der Telegrammstruktur von Kapitel \ref{subsub:DataTelegramm} mit dem Payload von Tabelle \ref{tab:frame_data}.
 
-Nun kann gemäss Abbildung \ref{fig:TestszenarioSniffer} das Triggerintervall erhöht werden. In Abbildung \ref{fig:ReineDaten} ist ersichtlich, dass das maximale Intervall 1 ms beträgt. Somit wurden Messungen für 100 ms, 50 ms, 10ms, 1ms durchgeführt.
+Nun kann gemäss Abbildung \ref{fig:TestszenarioSniffer} das Triggerintervall verkleinert werden. In Abbildung \ref{fig:ReineDaten} ist ersichtlich, dass das Intervall 1 ms beträgt. Es wird mit einer Messung mit einem Triggerintervall von 50 ms gestartet und danach so lange halbiert, bis die Werte nicht mehr stimmen. Damit kann die Auslastungsgrenze des Aufbaus bestimmt werden. Eine Messung mit 1 ms wird ebenfalls noch geprüft.
 
 Die empfangenen Daten werden dann in einem Balkendiagramm dargestellt. Auf der X Achse die Telegramme und auf der Y Achse die Anzahl Telegramme, die empfangen wurden. Erwartet wird, dass vier gleich grosse Balken sichtbar werden.
 

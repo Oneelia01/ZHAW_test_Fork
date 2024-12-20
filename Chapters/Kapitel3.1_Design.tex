@@ -79,7 +79,7 @@ Der Entscheid für den FPGA und gegen die nicht programmierbare, reine Hardwarel
 Für die Projektarbeit wurde das FPGA-Entwicklungskit 10M08SAE144C8G zur Verfügung gestellt.
 
 \subsubsection{SPI}
-Für die Kommunikation zwischen FPGA und ESP32 wurde das Protokoll SPI gewählt, weil es diese Kommunikation möglich macht gleichzeitig zu schreiben, sowie Daten zu empfangen (Full Duplex fähig). Des Weiteren können mit diesem Übertragungsprotokoll sehr hohe Raten erreicht werden, welche bei der berechneten Busauslastung (siehe Kapitel \ref{fig:MessaufbauBusauslastungMessen}) von Vorteil ist. Alternativ hätten weitere Protokolle gewählt werden können. In Tabelle \ref{tab:spi_vergleich} ist ein kurzer Vergleich von SPI und zwei alternativen Kommunikationsprotokollen (I²C und UART) zu sehen. SPI ist dabei, wie bereits erwähnt, mit Abstand am schnellsten und einfach zu implementieren.
+Für die Kommunikation zwischen FPGA und ESP32 wurde das Protokoll SPI gewählt, weil es diese Kommunikation möglich macht gleichzeitig zu schreiben, sowie Daten zu empfangen (Full Duplex fähig). Des Weiteren können mit diesem Übertragungsprotokoll sehr hohe Raten erreicht werden, welche bei der berechneten Busauslastung (siehe Kapitel \ref{fig:MessaufbauBusauslastungMessen}) von Vorteil ist. Alternativ hätten weitere Protokolle gewählt werden können. In Tabelle \ref{tab:spi_vergleich} ist ein kurzer Vergleich von SPI und zwei alternativen Kommunikationsprotokollen (I²C und UART) zu sehen. SPI ist dabei, wie bereits erwähnt, mit Abstand am schnellsten und einfach zu implementieren. \cite{SPI}
 
 \begin{table}[ht]
 \renewcommand{\arraystretch}{1.5} % Zeilenabstand erhöhen
@@ -90,7 +90,7 @@ Für die Kommunikation zwischen FPGA und ESP32 wurde das Protokoll SPI gewählt,
 \textbf{Kommunikationsart} & Full duplex & Half duplex & Half duplex \\
 \textbf{Anzahl Leitungen} & 4 (MISO, MOSI, SCLK, SS) & 2 (SDA, SCL) & 2 (TX, RX) \\
 \textbf{Taktung}        & Synchron & Synchron & Asynchron \\
-\textbf{Datenrate}      & 50+ Mbit/s & Bis zu 4 Mbit/s & Bis zu 1 Mbit/s \\
+\textbf{Datenrate}      & 50+ MBit/s & Bis zu 4 MBit/s & Bis zu 1 MBit/s \\
 \textbf{Vorteile}       & Hohe Datenrate, Full duplex, einfache Hardware & Wenige Leitungen, mehrere Geräte auf einem Bus & Einfach zu implementieren, universell einsetzbar \\
 \textbf{Nachteile}      & Viele Leitungen bei mehreren Slaves, keine eingebaute Fehlerkorrektur & Geringere Geschwindigkeit, zusätzliche Protokollverwaltung & Keine Taktleitung, potenziell ungenau bei Baudrate-Mismatch \\
 \bottomrule

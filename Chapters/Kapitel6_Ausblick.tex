@@ -13,7 +13,7 @@ Die Konfigurierung des FPGA kann so ausgebaut werden, dass ein senden der Daten 
 
 Es ist vorgesehen, dass das FPGA zusätzlich zu den Daten einen Zeitstempel übermittelt, damit weitere Auswertungen der Daten Aussagekräftiger werden.
 
-Eine weitere Idee, ist es die komplette Decodierung und Auswertung des Manchestersignal im FPGA durchzuführen, und dem Mikrocontroller nur den Payload, mit der Info ob es ein Master oder Slave Frame ist, weiterzugeben. Dabei wäre es notwendig einen Puffer anzulegen, welcher je nach Telegramm veränderlich gross ist. 
+Eine weitere Idee, ist es die komplette Decodierung und Auswertung des Manchestersignal im FPGA durchzuführen, und dem Mikrocontroller nur den Payload, mit der Info ob es ein Master oder Slave-Frame ist, weiterzugeben. Dabei wäre es notwendig einen Puffer anzulegen, welcher je nach Telegramm veränderlich gross ist. 
 
 Wie in Abbildung \ref{fig:FPGAanalyse} zu sehen ist, wurde nur gerade 4 \% des FPGA für Logik des Sniffers benötigt. Hier stellt sich die Frage ob nicht allenfalls ein kleinerer FPGA in betracht gezogen werden kann um Einsparungen in Ausgaben und Platz erzielen zu können.\\
 
