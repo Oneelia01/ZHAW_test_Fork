@@ -4,7 +4,7 @@ In diesem Abschnitt werden die Testszenarien beschrieben, wie die einzelnen Hard
 
 \subsection{FPGA Decodierung und SPI Test}
 \label{sub:FPGADecSPITest}
-Um zu Verifizieren ob die Decodierung des Manchester-Signal und die Ausgabe der Daten per SPI korrekt funktionieren, wurde mittels Matlab und der Software "'ArbExpress"' ein vom MVB aufgenommenes Signal so aufbereitet, dass dies mit dem Signalgenerator \textit{Tektronix AFG 3102} abgespielt werden konnte. Mit dem Tektronix ist es möglich über die beiden Outputs A \& B ein differentielles Signal auszugeben. Somit wurde das Signal (siehe Abbildung \ref{fig:ReineDaten}) welches zur Bestimmung der Busauslastung aufgenommen wurde, mit dem Tektronix abgespielt. Das Signal wurde anschliessend über den RS485-Transceiver auf den FPGA geführt. Der Ausgang des FPGA mit den ausgewerteten Daten wurde über SPI auf das \textit{Picoscope 2207B} geführt. Mit der Software "'PicoScope 7"' konnten die ausgegebenen Daten gelesen und analysiert werden. Es wurden verschieden grosse Telegramme aufbereitet und zur Überprüfung mit dem Signalgenerator ausgegeben. In einer ersten Phase wurde der Test ohne die Implementierung des 64-Bit-Puffers durchgeführt. Da der ESP32 mehr Zeit zur Verarbeitung der Daten benötigte, wurde, wie in Kapitel \ref{fpga:spi} beschrieben, eine Pufferung der Daten implementiert, bevor diese per SPI übertragen werden. Folglich wurde auch das FPGA mit dem implementierten Puffer gestestet\\
+Um zu verifizieren, ob die Decodierung des Manchester-Signals und die Ausgabe der Daten per SPI korrekt funktionieren, wurde mittels Matlab und der Software ArbExpress ein vom MVB aufgenommenes Signal so aufbereitet, dass dies mit dem Signalgenerator \textit{Tektronix AFG 3102} abgespielt werden konnte. Mit dem Tektronix ist es möglich, über die beiden Outputs A \& B ein differentielles Signal auszugeben. Somit wurde das Signal (siehe Abbildung \ref{fig:ReineDaten}), welches zur Bestimmung der Busauslastung aufgenommen wurde, mit dem Tektronix abgespielt. Das Signal wurde anschliessend über den RS485-Transceiver auf den FPGA geführt. Der Ausgang des FPGA mit den ausgewerteten Daten wurde über SPI auf das \textit{Picoscope 2207B} geführt. Mit der Software PicoScope 7 konnten die ausgegebenen Daten gelesen und analysiert werden. Es wurden verschieden grosse Telegramme aufbereitet und zur Überprüfung mit dem Signalgenerator ausgegeben. In einer ersten Phase wurde der Test ohne die Implementierung des 64-Bit-Puffers durchgeführt. Da der ESP32 mehr Zeit zur Verarbeitung der Daten benötigte, wurde, wie in Kapitel \ref{fpga:spi} beschrieben, eine Pufferung der Daten implementiert, bevor diese per SPI übertragen werden. Folglich wurde auch das FPGA mit dem implementierten Puffer getestet.\\
 In Abbildung \ref{fig:TestszenarioFPGA} ist der Testaufbau des FPGA zu sehen.
 
 \begin{figure}[H]
@@ -20,10 +20,10 @@ Für den Test wurden folgende Einstellungen am Tektronix vorgenommen:\\
 \textbf{Spannungsbereich:}\hspace{0.25cm} \textbf{0 V - 5 V}\\
 \\
 Der Tektronix wurde auf Burst eingestellt, wodurch das Telegramm immer wieder nach der eingestellten Zeit abgespielt wird.
-Dabei wurde der Test mit \textbf{100 ms} und \textbf{1 ms} Zeit zwischen dem abgespielten Signal durchgeführt. Bei 1 ms wird die Auslastung, wie diese auf dem MVB statt findet,
+Dabei wurde der Test mit \textbf{100 ms} und \textbf{1 ms} Zeit zwischen dem abgespielten Signal durchgeführt. Bei 1 ms wird die Auslastung, wie diese auf dem MVB stattfindet,
 simuliert.\\
 \\
-Es wird erwartet dass die Daten, wie diese in der Tabelle \ref{tab:frame_data} zu sehen sind, übertragen werden. Diese Daten sollen mit in der Software \textit{Picoscope 7} ersichtlich sein.
+Es wird erwartet, dass die Daten, wie diese in der Tabelle \ref{tab:frame_data} zu sehen sind, übertragen werden. Diese Daten sollen in der Software Picoscope 7 ersichtlich sein.
 
 \begin{table}[h!]
     \centering
@@ -53,7 +53,7 @@ Es wird erwartet dass die Daten, wie diese in der Tabelle \ref{tab:frame_data} z
 \subsection{ESP32 SPI und Statemachine Test}
 \label{sub:ESPSPIundFSMTest}
 
-Für die Verifikation der Firmware auf dem ESP32-S3 wurde ein zweites Gerät, welches als SPI-Master den FPGA simulieren soll, verwendet. Die Hardware, welche als SPI Master verwendet wurde, war ein ESP32. Dies aus dem Grund, weil bereits Erfahrungen mit dem ESP32 vorhanden waren und das Aufsetzen des Gerätes, sowie das Ausgeben von Daten über die SPI schnell realisiert werden konnten. In Abbildung \ref{fig:TestszenarioESP32} ist der schematische Aufbau zu sehen. Es wurden die Verbindungen für die SPI-Leitungen und GND verbunden. Auf einem Laptop wurde die Open-Source-Software Bluetility\cite{BLUETILITY_APPLICATION}, ein Tool für Bluetooth Low Energy, verwendet. Mit dieser Anwendung können Geräte gescannt, deren Dienste und Eigenschaften durchsucht, sowie Werte gelesen, geschrieben und abonniert werden. Gemäss Kapitel \ref{sub:BluetoothGATT} wurden die Daten in der Charakteristik mit der roten Zahl 1 empfangen. Zusätzlich wird die Reaktionszeit beim Empfangen der SPI-Daten gemessen. Dies wird durch das Vergleichen der Chip Select-Leitung und der Handshakeleitung \textcolor{red}{berechnet.?} 
+Für die Verifikation der Firmware auf dem ESP32-S3 wurde ein zweites Gerät, welches als SPI-Master den FPGA simulieren soll, verwendet. Die Hardware, welche als SPI Master verwendet wurde, war ein ESP32. Dies aus dem Grund, weil bereits Erfahrungen mit dem ESP32 vorhanden waren und das Aufsetzen des Gerätes, sowie das Ausgeben von Daten über die SPI schnell realisiert werden konnten. In Abbildung \ref{fig:TestszenarioESP32} ist der schematische Aufbau zu sehen. Es wurden die Verbindungen für die SPI-Leitungen und GND verbunden. Auf einem Laptop wurde die Open-Source-Software Bluetility\cite{BLUETILITY_APPLICATION}, ein Tool für Bluetooth Low Energy, verwendet. Mit dieser Anwendung können Geräte gescannt, deren Dienste und Eigenschaften durchsucht, sowie Werte gelesen, geschrieben und abonniert werden. Gemäss Kapitel \ref{sub:BluetoothGATT} wurden die Daten in der Charakteristik mit der roten Zahl 1 empfangen. Zusätzlich wird die Reaktionszeit beim Empfangen der SPI-Daten gemessen. Das gesamte Projektfile für den SPI Master ist im Anhang \ref{app:Ordner42} zu finden. 
 
 \begin{figure}[H]
     \centering
@@ -64,7 +64,7 @@ Für die Verifikation der Firmware auf dem ESP32-S3 wurde ein zweites Gerät, we
 
 Der SPI-Master konnte zwei unterschiedliche Telegramme schicken. Es kann entweder das kürzeste oder das längste Telegramm geschickt werden. Die Auswahl ist von Pin 21 (siehe Abbildung \ref{fig:TestszenarioESP32}) abhängig. Wird dieser Pin zu Ground gezogen, wird das lange Telegramm geschickt. Bleibt der Kontakt offen, wird das kurze Telegramm gesendet. Das Senden eines Paketes wird durch Drücken des Boot-Knopfes ausgelöst. Dies zieht den Pin 0 zu Ground , was im Programm ausgewertet werden kann. 
 
-Der Inhalt, der in Tabelle \ref{tab:TestDataESP32} zu sehen ist, sind die Nutzdatenbits, welche vom SPI Master geschickt werden. Der SPI-Master schickt die Daten wie der FPGA Manchester encodiert in 64 Bit-Päckchen, also jeweils 32 Bit Nutzdatenbits. Bei den Slave Daten wurde absichtlich ein lesbarer ASCII String für die Dummy Daten verwendet, da diese in Bluetility direkt ersichtlich ist.
+Der Inhalt, der in Tabelle \ref{tab:TestDataESP32} zu sehen ist, sind die Nutzdatenbits, welche vom SPI Master geschickt werden. Der SPI-Master schickt die Daten, die der FPGA Manchester encodiert in 64 Bit-Päckchen, also jeweils 32 Bit Nutzdatenbits. Bei den Slave-Daten wurde absichtlich ein lesbarer ASCII-String für die Dummy-Daten verwendet, da diese in Bluetility direkt ersichtlich sind.
 
 \begin{table}[H]
     \centering
@@ -80,7 +80,7 @@ Der Inhalt, der in Tabelle \ref{tab:TestDataESP32} zu sehen ist, sind die Nutzda
     \label{tab:TestDataESP32}
 \end{table}
 
-Folgende Zeiten werden mit dem Oszilloskop gemessen und die Werte entsprechend in den Resultaten dargestellt. Diese werden in der Diskusion aufgegriffen:
+Folgende Zeiten werden mit dem Oszilloskop gemessen und die Werte entsprechend in den Resultaten dargestellt. Diese werden in der Diskussion aufgegriffen:
 \begin{itemize}
     \item Reaktionszeit: Die Zeit zwischen positiver Flanke der Chip-Select-Leitung (Kanal A) und der negativen Flanke der Handshake-Leitung (Kanal B)
     \item Back-to-Receive-Zeit (BTR-Zeit): Die Zeit zwischen positiver Flanke der Chip-Select-Leitung und der positiven Flanke der Handshake-Leitung.
@@ -89,7 +89,7 @@ Folgende Zeiten werden mit dem Oszilloskop gemessen und die Werte entsprechend i
 \subsection{Verbindungstest ESP32 zu FPGA}
 \label{subsec:VerbindugstestESP32FPGA}
 
-Um zu testen ob die Decodierung des Manchestersignal bis hin zur Übertragung via Bluetooth korrekt funktioniert, wurde ein Testaufbau des ganzen Sniffers realisiert. Für den Aufbau wurden die verschiedenen Komponenten des Sniffers wie in Abbildung \ref{fig:TestszenarioSniffer} zu sehen ist, verbunden.
+Um zu testen, ob die Decodierung des Manchestersignals bis hin zur Übertragung via Bluetooth korrekt funktioniert, wurde ein Testaufbau des ganzen Sniffers realisiert. Für den Aufbau wurden die verschiedenen Komponenten des Sniffers, wie in Abbildung \ref{fig:TestszenarioSniffer} zu sehen ist, verbunden.
 
 \begin{figure}[H]
     \centering
@@ -106,11 +106,11 @@ In diesem Testaufbau wurden die gleichen Daten, wie diese in der Tabelle \ref{ta
 \subsection{Stresstest FPGA zu ESP32}
 \label{sub:MethStesstest}
 
-Bei einem höheren Triggerintervall ist die händische Auswertung mit Picoscope und Bluetility nicht mehr genau genug. Differenzen in der Übertragung können erkennt werden, jedoch sind diese schnell wieder aus dem Bufferbereich verschwunden und die Daten verloren.
+Bei einem höheren Triggerintervall ist die händische Auswertung mit Picoscope und Bluetility nicht mehr genau genug. Differenzen in der Übertragung können erkannt werden, jedoch sind diese schnell wieder aus dem Bufferbereich verschwunden und die Daten verloren.
 
 Aus diesem Grund wurde eine andere Methode verwendet, um den Stresstest des FPGA, der Verbindung zum ESP und dessen Übertragung über Bluetooth zu testen. Der Testaufbau ist wie in Abbildung \ref{fig:TestszenarioSniffer} aufgebaut, jedoch wurde das Picoscope entfernt und die Übertragung über Bluetooth angepasst. 
 
-Mit ChatGPT wurde ein Python Script geschrieben, welches auf die Charakteristik subscribed, die empfangenen Daten in einem CSV File abspeichert und anschliessend mit einem weiteren Script eine Auswertung vornimmt. Der Code ist in Anhang \ref{app:File62} (logger.py) und \ref{app:File61} (analyse.py) zu finden. In Abbildung \ref{fig:TestszStresstest} ist eine schematische Abbildung davon zu sehen. 
+Mit ChatGPT wurde ein Python Script geschrieben, welches auf die Charakteristik subscribed, die empfangenen Daten in einem CSV File abspeichert und anschliessend mit einem weiteren Script eine Auswertung vornimmt. Der Code ist im Anhang \ref{app:File62_an} (logger.py) und \ref{app:File61_lg} (analyse.py) zu finden. In Abbildung \ref{fig:TestszStresstest} ist eine schematische Abbildung davon zu sehen. 
 
 \begin{figure}[H]
     \centering
@@ -123,5 +123,5 @@ Es werden genau vier unterschiedliche Telegramme erwartet. Diese werden in der T
 
 Nun kann gemäss Abbildung \ref{fig:TestszenarioSniffer} das Triggerintervall verkleinert werden. In Abbildung \ref{fig:ReineDaten} ist ersichtlich, dass das Intervall 1 ms beträgt. Es wird mit einer Messung mit einem Triggerintervall von 50 ms gestartet und danach so lange halbiert, bis die Werte nicht mehr stimmen. Damit kann die Auslastungsgrenze des Aufbaus bestimmt werden. Eine Messung mit 1 ms wird ebenfalls noch geprüft.
 
-Die empfangenen Daten werden dann in einem Balkendiagramm dargestellt. Auf der X Achse die Telegramme und auf der Y Achse die Anzahl Telegramme, die empfangen wurden. Erwartet wird, dass vier gleich grosse Balken sichtbar werden.
+Die empfangenen Daten werden dann in einem Balkendiagramm dargestellt. Auf der X-Achse die Telegramme und auf der Y-Achse die Anzahl Telegramme, die empfangen wurden. Erwartet wird, dass vier gleich grosse Balken sichtbar werden.
 

@@ -71,9 +71,9 @@ Die Back-to-Receive-Zeit (BTR-Zeit) entspricht einem akzeptablen Wert von 12 $\m
 
 Der Übertragungstest des SPI-Protokolls zwischen FPGA und ESP32-S3 war erfolgreich. Die Ergebnisse in Tabelle \ref{tab:EmpfTeleg3sTrigg} und Abbildung \ref{fig:VerbindungstestZeiten} bestätigen die Funktionalität der Kommunikation.
 
-Die Metadaten des vierten Frames (0x01) zeigen korrekt an, dass das Telegramm nur mit einem Master-Frame gesendet wurde. Während einer 60-sekün-digen Messung wurden alle Telegramme korrekt empfangen. Die gemessenen Zeiten für Reaktion 2 $\mu$s und Back-to-Receive 12 $\mu$s entsprechen den Anforderungen aus Kapitel \ref{sub:ESPSPIundFSMTest}.
+Die Metadaten des vierten Frames (0x01) zeigen korrekt an, dass das Telegramm nur mit einem Master-Frame gesendet wurde. Während einer 60-sekündigen Messung wurden alle Telegramme korrekt empfangen. Die gemessenen Zeiten für Reaktion 2 $\mu$s und Back-to-Receive 12 $\mu$s entsprechen den Anforderungen aus Kapitel \ref{sub:ESPSPIundFSMTest}.
 
-Die Busauslastung war im Test nicht repräsentativ für reale Szenarien, weshalb zusätzliche Stresstests durchgeführt wurden (Kapitel \ref{}). Diese dienen der Validierung unter höherer Belastung.
+Die Busauslastung war im Test nicht repräsentativ für reale Szenarien, weshalb zusätzliche Stresstests durchgeführt wurden (Kapitel \ref{sec:DiskStresstest}). Diese dienen der Validierung unter höherer Belastung.
 
 Zusammenfassend arbeitet das System stabil und erfüllt die Anforderungen bei der Verarbeitung der Daten, vorbehaltlich der Ergebnisse des Stresstests.
 
@@ -104,8 +104,9 @@ Aufgrund fehlender Zeit kann dies nicht mehr weiterverfolgt und gemessen werden.
 
 \section{Prototyp Sniffer}
 \label{sec:DiskussionSniffer}
-Das Minimal-Value Ziel wie es in der Tabelle \ref{tab:minvalueproduct} festgehalten ist, konnte nur teilweise erreicht werden. Die Auswertung und Übertragung bis hin zur Ausgabe per Bluetooth eines MVB-Telegrammes funktioniert fehlerfrei. Jedoch wurde im FPGA kein Zeitstempel implementiert, und weiter konnte das PCB in Altium nicht fertiggestellt werden.
+Das Minimal-Value Ziel wie es in der Tabelle \ref{tab:minvalueproduct} festgehalten ist, konnte nur teilweise erreicht werden. Die Auswertung und Übertragung bis hin zur Ausgabe per Bluetooth eines MVB-Telegramms funktioniert fehlerfrei. Jedoch wurde im FPGA kein Zeitstempel implementiert, und weiter konnte das PCB in Altium nicht fertiggestellt werden.
 
-Hauptursachen zur Nichterreichung des Zieles sind aufgetretene Fehler in der Entwicklung und die fehlende Zeit zum Schluss der Projektarbeit. Dadurch dass Quartus zur Entwicklung und Synthetisierung des VHDL-Codes, als auch Altium zur Entwicklung des PCB, neue Entwicklungsumgebungen waren in denen noch keine Kenntnisse vorhanden waren, wurde mehr Zeit als geplant aufgewendet um die Umgebungen und dessen Prozesse kennen zu lernen, sodass ein erfolgreicher Sniffer entwickelt werden kann.
+Hauptursachen zur Nichterreichung des Zieles sind aufgetretene Fehler in der Entwicklung und die fehlende Zeit zum Schluss der Projektarbeit. Dadurch, dass Quartus zur Entwicklung und Synthetisierung des VHDL-Codes sowie Altium zur Entwicklung des PCBs neue Entwicklungsumgebungen waren, in denen noch keine Kenntnisse vorhanden waren, wurde mehr Zeit als geplant aufgewendet, um die Umgebungen und deren Prozesse kennenzulernen, sodass ein erfolgreicher Sniffer entwickelt werden kann.
 
-Zu Beginn der Projektarbeit wurde ein Zeitplan (siehe Anhang \ref{app:Zeitplan}) erstellt, in welchem die zu erledigenden Arbeiten mit deren Sollzeit aufgelistet sind. Es ist zu sehen dass viele Abweichungen zwischen "'Ist"' und "'Soll"' festzustellen sind. Diese Abweichungen sind, wie bereits erwähnt, auf die Probleme in der Entwicklung und die längere Zeit zur Einarbeitung in die Entwicklungsumgebungen zurückzuführen. In der Mitte der Projektarbeit wurde ein Minimal-Value Ziel definiert. Daraufhin wurden einige geplante Aufgaben nicht mehr weiter verfolgt. Diese Aufgaben sind im Zeitplan unter "'Ist"' mit "'nicht ausgeführt"' vermerkt.
+
+Zu Beginn der Projektarbeit wurde ein Zeitplan (siehe Anhang \ref{app:Zeitplan}) erstellt, in welchem die zu erledigenden Arbeiten mit deren Sollzeit aufgelistet sind. Es ist zu sehen, dass viele Abweichungen zwischen "'Ist"' und "'Soll"' festzustellen sind. Diese Abweichungen sind, wie bereits erwähnt, auf die Probleme in der Entwicklung und die längere Zeit zur Einarbeitung in die Entwicklungsumgebungen zurückzuführen. In der Mitte der Projektarbeit wurde ein Minimal-Value Ziel definiert. Daraufhin wurden einige geplante Aufgaben nicht mehr weiterverfolgt. Diese Aufgaben sind im Zeitplan unter "'Ist"' mit "'nicht ausgeführt"' vermerkt.

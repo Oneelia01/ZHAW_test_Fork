@@ -9,30 +9,26 @@
 
 \chapter{Theoretische Grundlagen} % Main chapter title
 \label{Chapter2TheoretischeGrundlagen} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Der MVB ist ein in der Bahnindustrie verbreiteter Fahrzeugbus, welcher auf dem Prinzip \textit{single master - multiple slaves} aufbaut. In folgenden Abschnitten werden die Grundlagen des Busses aufgezeigt. Alle Daten und Abbildungen in folgendem Kapitel wurden, wenn nicht anders deklariert, aus der Norm IEC 61375-3-1 entnommen. \cite{MVB_Norm} 
+Der MVB ist ein in der Bahnindustrie verbreiteter Fahrzeugbus, welcher auf dem Prinzip \textit{single master - multiple slaves} aufbaut. In folgenden Abschnitten werden die Grundlagen des Busses aufgezeigt. Alle Daten und Abbildungen in folgendem Kapitel wurden aus der Norm IEC 61375-3-1 entnommen. \cite{MVB_Norm} 
+
+Die Abschnitte beleuchtet die wesentlichen Aspekte des Physical und Link Layers des Datenbusses. Der Fokus liegt auf der Datenübertragungsgeschwindigkeit, dem Bit-Encoding und den Steuermechanismen wie den Start-Delimitern und dem Master-Slave-Prinzip. Neben den technischen Grundlagen, wie der Manchester-Kodierung und den Non-Data-Symbolen, wird die Struktur von Frames und Telegrammen detailliert beschrieben.
 
 %--------------------------------------------------------------------------------
-% SECTION "Multifunction Vehicle Bus"
+% SECTION "Linklayer"
 %--------------------------------------------------------------------------------
 
-\section{Multifunction Vehicle Bus}
+\section{Link Layer}
 
-%\textcolor{red}{Einführung in Grundbegriffe und das Konzept MVB, In der Regel ist zumindest ein kurzes Theoriekapitel notwendig. Es nimmt Bezug  auf das thematische Oberthema, aber natürlich nicht auf allgemeine theoretische Grundlagen etwa aus der Naturwissenschaft.}
-%\textcolor{red}{Vlt noch ergänzen optisch und elektrische(EMD, ESD)Ausführungen und bei Sicherheitskritischen Anwendungen (nicht Komfort) meist Redundant geführt Linie A und B..}
-
-Der Abschnitt beleuchtet die wesentlichen Aspekte des Physical und Link Layers des Datenbusses gemäss der Norm SN EN 61375. Der Fokus liegt auf der Datenübertragungsgeschwindigkeit, dem Bit-Encoding und den Steuermechanismen wie den Start-Delimitern und dem Master-Slave-Prinzip. Neben den technischen Grundlagen, wie der Manchester-Kodierung und den Non-Data-Symbolen, wird die Struktur von Frames und Telegrammen detailliert beschrieben.
-
-Nachfolgende Texte sowie Illustrationen sind alle aus der Norm SN EN 61375-3-1 Kapitel 
-
+Dieser Abschnitt erläutert den Link Layer und geht auf das Master- sowie das Slave-Frame und den Aufbau der Check Sequenz ein. Diese Teile werden dann zusammengesetzt und das Master/ Slave Prinzip erklärt. Abgeschlossen wird mit der Perioden Zeiten des Buses.
 
 %-----------------------------------
 % SUBSECTION "MVB Bus"
 %-----------------------------------
 
 %\textcolor{red}{MVB Aufbau, Master Slave Prinzip, Telegrammme, F-Codes}
-\subsection{Linklayer - Master-Frame}
+\subsection{Master-Frame}
 \label{sub:MasterFrame}
-Das Master-Frame ist der Anfang eines Telegrammes und wird immer vom Busmaster gesendet. Nach dem Startbit folgen 8 Bit, welche dem Master-Frame Delimiter in Abbildung \ref{fig:FrameDelimiterMasterSlave} entsprechen. 
+Das Master-Frame ist der Anfang eines Telegramms und wird immer vom Busmaster gesendet. Nach dem Startbit folgen 8 Bit, welche dem Master-Frame Delimiter in Abbildung \ref{fig:FrameDelimiterMasterSlave} entsprechen. 
 
 \begin{figure}[H]
     \centering
@@ -58,9 +54,9 @@ Das Master-Frame ist der Anfang eines Telegrammes und wird immer vom Busmaster g
         
 \end{figure}
 
-\subsection{Linkayer - Slave-Frame}
+\subsection{Slave-Frame}
 \label{sub:SlaveFrame}
-Das Slave-Frame folgt direkt nach dem Master-Frame, sofern der angesprochene Slave eingeschalten und sendefähig ist. Ansonsten würde der Master nach einer definierten maximalen Wartezeit ein neues Telegramm beginnen. \newline
+Das Slave-Frame folgt direkt nach dem Master-Frame, sofern der angesprochene Slave eingeschaltet und sende fähig ist. Ansonsten würde der Master nach einer definierten maximalen Wartezeit ein neues Telegramm beginnen. \newline
 Im Gegensatz zum Master-Frame hat der Slave-Frame verschiedene Längen, je nach F-Code. Je nach Grösse werden ebenfalls mehrere Check-Sequenzen geschickt. Eine Check-Sequenz kann dabei bis zu 64 Bit verifizieren.
 
 \begin{enumerate}
@@ -77,7 +73,7 @@ Im Gegensatz zum Master-Frame hat der Slave-Frame verschiedene Längen, je nach 
     \label{fig:SlaveFrameFormat}
 \end{figure}
 
-\subsection{Linklayer - Check Sequence}
+\subsection{Check Sequence}
 \label{sub:CheckSequenz}
 Die Prüfsequenz wird als zyklische Redundanzprüfung (CRC) für die 16, 32 oder 64 Bit an Daten berechnet, welche gemäss dem generativen Polynom in Gleichung \ref{equ:GenerativesPolynom} berechnet werden soll.
 
@@ -86,9 +82,9 @@ Die Prüfsequenz wird als zyklische Redundanzprüfung (CRC) für die 16, 32 oder
     \label{equ:GenerativesPolynom}
 \end{equation}
 
-\subsection{Link Layer - Master / Slave Prinzip}
+\subsection{Master / Slave Prinzip}
 \label{sub:MasterSlavePrinzip}
-Der MVB wird mit ein Master - Slave Prinzip realisiert. Der Master fordert mit einem definierten \textit{Master\_Frame} (Kapitel \ref{sub:MasterFrame}) die Daten der jeweiligen Slave-Teilnehmer an. Der Slave beantwortet die Anfrage mit einem \textit{Slave\_Frame} (Kapitel \ref{sub:SlaveFrame}. Das Master- und Slave-Frame bilden zusammen ein Telegram (Siehe Abbildung \ref{fig:Fig39_Telegamm_definition.png}). 
+Der MVB wird mit einem Master - Slave Prinzip realisiert. Der Master fordert mit einem definierten Master-Frame (Kapitel \ref{sub:MasterFrame}) die Daten der jeweiligen Slave-Teilnehmer an. Der Slave beantwortet die Anfrage mit einem Slave-Frame (Kapitel \ref{sub:SlaveFrame}. Das Master- und Slave-Frame bilden zusammen ein Telegramm (Siehe Abbildung \ref{fig:Fig39_Telegamm_definition.png}). 
 
 \begin{figure}[H]
     \centering
@@ -97,7 +93,7 @@ Der MVB wird mit ein Master - Slave Prinzip realisiert. Der Master fordert mit e
     \label{fig:Fig39_Telegamm_definition.png}
 \end{figure}
 
-In der Norm \textit{SN EN 61375} sind die Telegramme in 16 verschiedene Frame-Codes (F-Codes) unterteilt. In Abbildung \ref{fig:FCodeListe} ist eine tabellarische Auflistung zu sehen. 
+In der Norm sind die Telegramme in 16 verschiedene Frame-Codes (F-Codes) unterteilt. Dieser Code wird im Master-Frame geschickt. In Abbildung \ref{fig:FCodeListe} ist eine tabellarische Auflistung zu sehen. 
 
 \begin{figure}[H]
     \centering
@@ -106,16 +102,38 @@ In der Norm \textit{SN EN 61375} sind die Telegramme in 16 verschiedene Frame-Co
     \label{fig:FCodeListe}
 \end{figure}
 
-\subsection{Physical Layer - Geschwindigkeit auf dem Datenbus}
-\label{sub:GeschwindigkeitDatenbus}
-Die Signalgeschwindigkeit ist in der Norm \textit{SN EN 61375-3-1:2012 Kap. 4.3.1} definiert. Diese lautet 1.5 MBit/s $\pm$ 0.01\% mit Manchester Encoding (siehe \ref{sub:BitEncoding})
+F-Codes 5,6,7,10 und 11 sind nicht definiert und werden nicht verarbeitet (ungültig). In der jeweiligen Spalte Master-Frame und Slave-Frame sind die jeweiligen Werte eingetragen, welche im Frame enthalten sind und dessen Grösse. 
 
-\begin{itemize}
-  \item BR (Bitrate): 1.5 MHz oder 1.5 MBit/s
-  \item BT (Bittime): 666.7 ns
-\end{itemize}
+\subsection{Perioden auf dem Bus}
+\label{sub:PeriodeAufDemBus}
 
-\subsection{Physical Layer - Bit-Encoding}
+Der Bus ist in 4 verschiedenen Perioden aufgebaut. Die 4 Perioden zusammen werden Basic Period genannt. Die 4 Perioden laufen:
+
+\begin{enumerate}
+    \item \textbf{Periodic Phase}: In dieser Phase werden Zyklische Daten übertragen
+    \item \textbf{Supervisory Phase}: In dieser Phase können Geräte gescannt werden
+    \item \textbf{Event Phase}: In dieser Phase werden Event-Daten (Message Data) übertragen. Wird in der Arbeit nicht weiter verfoglt
+    \item \textbf{Guard Phase}: Diese wird sich der Busmaster auf die nächste Periode vorbereiten
+\end{enumerate}
+
+In der Norm ist die Basic Period wie in Abbildung \ref{fig:BasicPeriod} illustriert.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Figures/Chap2/Grundlagen/BasicPeriod.png}
+    \caption{Basic Periode auf dem MVB Bus}
+    \label{fig:BasicPeriod}
+\end{figure}
+
+%--------------------------------------------------------------------------------
+% SECTION "Physical"
+%--------------------------------------------------------------------------------
+
+\section{Physical Layer}
+
+Dieser Abschnitt geht detaillierter auf die Übertragung ein und erklärt, wie die Bit encodiert werden, welche Non-Data-Symbols vorhanden sind und wie damit die Start-Delimiter aufgebaut sind. Zudem wird das Übertragungsmedium und die Geschwindigkeit auf dem Bus gezeigt.
+
+\subsection{Bit-Encoding}
 \label{sub:BitEncoding}
 Die Frame-Data sollen gemäss folgender \textit{Bit-Encoding} (Abb. \ref{fig:manchester_Bit_Encoding}) kodiert werden.
 
@@ -124,6 +142,9 @@ Die Frame-Data sollen gemäss folgender \textit{Bit-Encoding} (Abb. \ref{fig:man
     \item Eine "'0"' soll kodiert werden als ein \textbf{LOW} in der ersten und dann ein \textbf{HIGH} in der zweiten Hälfte des Bit
 \end{itemize}
 
+Das entspricht dem Manchester-Code.
+
+ 
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.7 \textwidth]{Figures/Chap2/Grundlagen/MVB_DOKU/Layer/Bit_Encoding.png}
@@ -131,9 +152,9 @@ Die Frame-Data sollen gemäss folgender \textit{Bit-Encoding} (Abb. \ref{fig:man
     \label{fig:manchester_Bit_Encoding}
 \end{figure}
 
-\subsection{Physical Layer - Non Data Symbols} 
+\subsection{Non Data Symbols} 
 \label{sub:NonDataSymbols}
-Der Start-Delimiter enthält \textit{Non Data Symbols}, welche zur Synchronisierung verwendet werden. Diese Symbols werden ebenfalls \textit{Manchastercode violations} genannt. Folgende Liste zeigt, wie die Symbols (Abb. \ref{fig:NonDataSymbolsEncoding}) kodiert sind
+Der Start-Delimiter enthält Non Data Symbols, welche zur Synchronisierung verwendet werden. Diese Symbols werden ebenfalls Manchastercode violations genannt. Folgende Liste zeigt, wie die Symbols (Abb. \ref{fig:NonDataSymbolsEncoding}) kodiert sind.
 
 \begin{itemize}
     \item "'NH"' soll kodiert werden als ein \textbf{HIGH} Signal während eines Bit 
@@ -147,9 +168,9 @@ Der Start-Delimiter enthält \textit{Non Data Symbols}, welche zur Synchronisier
     \label{fig:NonDataSymbolsEncoding}
 \end{figure}
 
-\subsection{Physical Layer - Start-Delimiter}
+\subsection{Start-Delimiter}
 \label{sub:StartDelimiter}
-Der Start-Delimiter hat die Funktion ein Frame eindeutig zu identifizieren. Hierbei gibt es zwei unterscheidbare Start-Delimiter, der \textit{Master-Frame Delimiter} und der \textit{Slave-Frame Delimiter}. In Abbildung \ref{fig:FrameDelimiterMasterSlave} sind beide Start-Delimiter aufgezeigt. Diese Abbildung stammt aus der MVB Case Study der EPFS und ist in Anhang \ref{app:File11} auf Seite 29 zu finden. Gut zu sehen sind die in Kapitel \ref{sub:NonDataSymbols} erwähnten Manchester Violations beim Master-Frame Delimiter an Stelle 1, 2, 4 und 5 und beim Slave-Frame Delimiter an den Stellen 4, 5, 7 und 8. Das gelb markierte \textit{Start Bit} ander der Stelle 0 hat die Funktion den Start nach einer unbestimmten Zeit im Zustand \textit{Idle} zu signalisieren. Dies gehört nicht zum Start-Delimiter (siehe Abbildung \ref{fig:MasterFrameFormat} und \ref{fig:SlaveFrameFormat}). Die Manchester decodierten Start-Delimiter sind somit wie folgt aufgebaut:
+Der Start-Delimiter hat die Funktion, ein Frame eindeutig zu identifizieren. Hierbei gibt es zwei unterscheidbare Start-Delimiter, der Master-Frame Delimiter und der Slave-Frame Delimiter. In Abbildung \ref{fig:FrameDelimiterMasterSlave} sind beide Start-Delimiter aufgezeigt. Diese Abbildung stammt aus der MVB Case Study der EPFL und ist im Anhang \ref{app:File11} auf Seite 29 zu finden. Gut zu sehen sind die in Kapitel \ref{sub:NonDataSymbols} erwähnten Manchester Violations beim Master-Frame Delimiter an Stelle 1, 2, 4 und 5 und beim Slave-Frame Delimiter an den Stellen 4, 5, 7 und 8. Das \textit{Start Bit} an der Stelle 0 hat die Funktion, den Start nach einer unbestimmten Zeit im Zustand \textit{Idle} zu signalisieren. Dies gehört nicht zum Start-Delimiter (siehe Abbildung \ref{fig:MasterFrameFormat} und \ref{fig:SlaveFrameFormat}). Die Manchester decodierten Start-Delimiter sind somit wie folgt aufgebaut:
 
 \begin{itemize}
     \item Master-Frame Delimiter: [NH, NL, 0, NH, NL, 0, 0, 0]
@@ -159,15 +180,15 @@ Der Start-Delimiter hat die Funktion ein Frame eindeutig zu identifizieren. Hier
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{Figures/Chap2/Grundlagen/MVB_DOKU/Layer/Frame_Delimiter.png}
+    \includegraphics[width=0.8\linewidth]{Figures/Chap2/Grundlagen/Startdelimiter_Master_Start_Norm.png}
     \caption{Illustration Master- und Slave-Frame Delimiter}
     \label{fig:FrameDelimiterMasterSlave}
 \end{figure}
 
-\section{Übertragungsmedien}
+\subsection{Übertragungsmedien}
 \label{Übertragungsmedien}
 
-Für den MVB sind in der Norm \textit{SN EN 61375-3-1 Kapitel 4.4 bis 4.6 } drei Varianten definiert. Diese sind wie folgt:
+Für den MVB sind in der Norm drei Varianten definiert. Diese sind wie folgt:
 \begin{itemize}
     \item \textbf{ESD:} Electrical Short Distance Bus
     Über eine Signalleitung mit Potenzialtrennung mit Optokoppler oder ohne Potenzialtrennung
@@ -208,3 +229,12 @@ Die Verbindungen zwischen ESD und EMD erfolgen über einen D-Sub9-Stecker. Tabel
 \end{table}
 
 Für das Übertragungsmedium OGF ist keine Pinbelegung erforderlich, da zwei separate Lichtwellenleiter verwendet werden: Einer dient zum Senden, der andere zum Empfangen von Signalen.
+
+\subsection{Physical Layer - Geschwindigkeit auf dem Datenbus}
+\label{sub:GeschwindigkeitDatenbus}
+Die Signalgeschwindigkeit ist in der Norm definiert. Diese lautet 1.5 MBit/s $\pm$ 0.01\% mit Manchester-Encoding (siehe \ref{sub:BitEncoding})
+
+\begin{itemize}
+  \item BR (Bitrate): 1.5 MHz oder 1.5 MBit/s
+  \item BT (Bittime): 666.7 ns
+\end{itemize}

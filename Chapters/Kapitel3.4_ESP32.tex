@@ -6,14 +6,14 @@
 \section{Firmware ESP32}
 %\textcolor{red}{Wie wurde die Firmware auf dem ESP32 umgesetzt? Kurze Einleitung noch schreiben}
 
-Die Firmware für den ESP32-S3 wurde mithilfe der ESP-IDF, dem IoT Development Framework geschrieben. Dabei wurde die Integration von FreeRTOS sowie das Aufsetzten eines BLuetooth GATT-Server programmiert. 
+Die Firmware für den ESP32-S3 wurde mithilfe der ESP-IDF, dem IoT Development Framework, geschrieben. Dabei wurde die Integration von FreeRTOS sowie das Aufsetzen eines Bluetooth GATT-Servers programmiert. 
 
-In Abbildung \ref{fig:FSMEinleitung} ist der Aufbau der Firmware grobschematisch zu sehen. Der Einsteigspunkt bietet dabei die \textit{app\_main()} Funktion, welche die Peripherien initialisiert und drei Task erstellt. Die main()-Funktion ist damit abgeschlossen und der Scheduler übernimmt die restliche Ausführung des Programmes. Das Symbol in der rechten unteren Ecke in T2 zeigt an, dass dieser Task eine State Machine umfasst. Auf die verschiedenen Task wird in diesem Abschnitt eingegangen.
+In Abbildung \ref{fig:FSMEinleitung} ist der Aufbau der Firmware grob schematisch zu sehen. Der Einstiegspunkt bietet dabei die \textit{app\_main()} Funktion, welche die Peripherien initialisiert und drei Tasks erstellt. Die main()-Funktion ist damit abgeschlossen und der Scheduler übernimmt die restliche Ausführung des Programms. Das Symbol in der rechten unteren Ecke in T2 zeigt an, dass dieser Task eine Statemachine umfasst. Auf die verschiedenen Tasks wird in diesem Abschnitt eingegangen.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Figures/Chap3/ESP/Einleitung/FSM_Einleitung.png}
-    \caption{Ablaufdiagram Firmware Sniffer von Programmeinstieg bis Task}
+    \caption{Ablaufdiagramm Firmware Sniffer von Programmeinstieg bis Task}
     \label{fig:FSMEinleitung}
 \end{figure}
 
@@ -24,7 +24,7 @@ In Abbildung \ref{fig:FSMEinleitung} ist der Aufbau der Firmware grobschematisch
 Für dieses Projekt kam FreeRTOS zum Einsatz, das bereits in der ESP-IDF, der Entwicklungsumgebung für den ESP32-S3, integriert ist. \cite{FREERTOS_IDF_API} In diesem Abschnitt werden die Umsetzung des Betriebssystems und die genutzten FreeRTOS-Elemente beschrieben, um den Betrieb zu ermöglichen.
 
 \subsubsection{Task}
-Es werden Task definiert, welche von einem Scheduler anschliessend gemanaged und aufgerufen werden. Für die Ausführung der Hauptaufgaben auf dem Sniffer wurden 3 Tasks gemäss Tabelle \ref{tab:TaskDefinitonen} definiert.
+Es werden Tasks definiert, welche von einem Scheduler anschliessend gemanagt und aufgerufen werden. Für die Ausführung der Hauptaufgaben auf dem Sniffer wurden 3 Tasks gemäss Tabelle \ref{tab:TaskDefinitonen} definiert.
 
 \begin{table}[H]
     \centering
@@ -38,7 +38,7 @@ Es werden Task definiert, welche von einem Scheduler anschliessend gemanaged und
         \hline
         Parameter & NULL & NULL & NULL\\ 
         \hline
-        Priorität & 3 & 3 & 1\\ 
+        Priorität & 3 & 2 & 1\\ 
         \hline
         Handle & NULL & NULL & NULL\\ 
         \hline
@@ -47,12 +47,12 @@ Es werden Task definiert, welche von einem Scheduler anschliessend gemanaged und
     \label{tab:TaskDefinitonen}
 \end{table}
 
-Der Task \textit{spi\_receive} und \textit{mvb\_manch\_decode} erhalten beide eine grössere Priorität als die Task \textit{bt\_send}. Wie in Abbildung \ref{fig:ReineDaten} zu sehen ist, gibt es Zeitabschnitte, in denen viele Daten verarbeitet werden müssen, gefolgt von Idle-Periode. In der Idle-Zeit hat der Task \textit{bt\_send} die Möglichkeit Telegramme über Bluetooth herauszuschicken.
+Der Task \textit{spi\_receive} und \textit{mvb\_manch\_decode} erhalten beide eine grössere Priorität als der Task \textit{bt\_send}. Wie in Abbildung \ref{fig:ReineDaten} zu sehen ist, gibt es Zeitabschnitte, in denen viele Daten verarbeitet werden müssen, gefolgt von einer Idle-Periode. In der Idle-Zeit hat der Task \textit{bt\_send} die Möglichkeit, Telegramme über Bluetooth herauszuschicken und soll nicht in einer Periode, wo viele Daten kommen, die CPU beanspruchen.
 
 
 \subsubsection{Queue}
 \label{subsub:Queue}
-Für den primären Datenaustausch zwischen den Tasks werden Queues verwendet. Wenn ein Task von einer leeren Queue lesen will, wird dieser in den \textit{blocking-state} versetzt. Dadruch gibt dieser Task die CPU frei und wird erst wieder aufgerufen, wenn sich ein Element in der Queue befindet.\cite{FREERTOS_QUEUE}
+Für den primären Datenaustausch zwischen den Tasks werden Queues verwendet. Wenn ein Task von einer leeren Queue lesen will, wird dieser in den \textit{blocking-state} versetzt. Dadurch gibt dieser Task die CPU frei und wird erst wieder aufgerufen, wenn sich ein Element in der Queue befindet.\cite{FREERTOS_QUEUE}
 
 Für die Intertask-Kommunikation wurden zwei Queue definiert. In Abbildung \ref{fig:QueueSchema} ist eine schematische Darstellung des Datenflusses gezeigt.
 
@@ -64,17 +64,17 @@ Für die Intertask-Kommunikation wurden zwei Queue definiert. In Abbildung \ref{
     \label{fig:QueueSchema}
 \end{figure}
 
-Die \textit{spi\_queue} fasst 64 Werte à 16 Bit. Die Wahl von 16 Bit basiert auf der Verarbeitung durch den Task \textit{mvb\_manch\_decode}. Die Grösse von 64 wurde gewählt, dass ein möglichst grosser Buffer ansteht und keine Daten verloren gehen können.
+Die \textit{spi\_queue} fasst 64 Werte à 16 Bit. Die Wahl von 16 Bit basiert auf der Verarbeitung durch den Task \textit{mvb\_manch\_decode}. Die Grösse von 64 wurde gewählt, damit ein möglichst grosser Buffer ansteht und keine Daten verloren gehen können.
 
-Die \textit{ble\_queue} fasst acht Pointer auf \textit{struct telegramm}. Pointer werden verwendet, da sie mit 4 Bytes deutlich speichereffizienter sind als das 40-Byte-grosse \textit{struct}. Die Grösse acht entspricht dem in Kapitel \ref{subsub:DataTelegramm} erstellten Arrays. So wird sichergestellt, dass Werte in der Queue nicht überschrieben werden, bevor sie über Bluetooth übertragen werden.
+Die \textit{ble\_queue} fasst acht Pointer auf \textit{struct telegramm}. Pointer werden verwendet, da sie mit 4 Bytes deutlich speicherplatzeffizienter sind als das 40 Byte grosse \textit{struct}. Die Grösse acht entspricht dem in Kapitel \ref{subsub:DataTelegramm} erstellten Arrays. So wird sichergestellt, dass Werte in der Queue nicht überschrieben werden, bevor sie über Bluetooth übertragen werden.
 
 \subsection{Global verwendete Datenstrukturen}
 \label{sub:GlobalDtatStruct}
-Für die Zwischenspeicherung der Telegrammdaten und des Empfangen von SPI-Daten werden zwei Globale Datenstrukturen erstellt, welche die Speicherung und die Leserlichkeit verbessern. 
+Für die Zwischenspeicherung der Telegrammdaten und das Empfangen von SPI-Daten werden zwei globale Datenstrukturen erstellt, welche die Speicherung und die Lesbarkeit verbessern. 
 
 \subsubsection{Datentyp Telegramm}
 \label{subsub:DataTelegramm}
-Für das Zusammensetzten der Telegramme wurde nachfolgendes \textit{struct} in C definiert.
+Für das Zusammensetzen der Telegramme wurde nachfolgendes \textit{struct} in C definiert.
 
 \begin{lstlisting}[language=C]
 typedef struct telegramm
@@ -97,13 +97,13 @@ Ein Array mit dem Makro \textit{MAX\_MESSAGES} wurde erstellt und ist global fü
 telegramm messages_tel[MAX_MESSAGES] = {0};
 \end{lstlisting}
 
-Damit wurde ein Speicherbereich für 8 Telegramme initialisiert. Das Array-Element wird im Task \textit{mvb\_manch\_decode} beschrieben und der Pointer auf das neu beschriebene Element aus dem Array über die ble\_queue dem Task \textit{bt\_send} weitergeben. 
+Damit wurde ein Speicherbereich für 8 Telegramme initialisiert. Das Array-Element wird im Task \textit{mvb\_manch\_decode} beschrieben und der Pointer auf das neu beschriebene Element aus dem Array über die ble\_queue dem Task \textit{bt\_send} weitergegeben. 
 
 
 \subsubsection{Union SPI-Receive}
 \label{subsub:UnionSPI}
 
-Der Buffer mit den empfangenen Daten von der SPI-Transaktion ist Little Endian. Für die Verarbeitung von jeweils 16bit müssen die Bytes jedoch noch vertauscht werden. Zu diesem Zweck wurde folgende Union in C gebildet.
+Der Buffer mit den empfangenen Daten von der SPI-Transaktion ist Little Endian. Für die Verarbeitung von jeweils 16 Bit müssen die Bytes jedoch noch vertauscht werden. Zu diesem Zweck wurde folgende Union in C gebildet.
 
 \begin{lstlisting}[language=C]
 union u_tel_message
@@ -131,7 +131,7 @@ Die Union wird nur vom Task \textit{spi\_receive} verwendet. Die Verwendung wird
 
 \subsection{Task - SPI Receive}
 \label{sub:TaskSPIReceive}
-Der ESP32-S3 verfügt über eine SPI-Schnittstelle, die für den Empfang von Daten verwendet wird. Im Rahmen dieses Projekts wurde ein 4-Buffer-System implementiert, basierend auf einem Beitrag\cite{ESP_FORUM_SPI_BUFFER}, um die Datenverwaltung effizient zu gestalten. 4 wurden gewählt, weil dies in Tests die geringste Anzahl Fehltransaktionen zeigte.
+Der ESP32-S3 verfügt über eine SPI-Schnittstelle, die für den Empfang von Daten verwendet wird. Im Rahmen dieses Projekts wurde ein 4-Buffer-System implementiert, basierend auf einem Beitrag\cite{ESP_FORUM_SPI_BUFFER}, um die Datenverwaltung effizient zu gestalten. 4 wurden gewählt, weil dies in Tests die geringste Anzahl an Fehltransaktionen zeigte.
 
 Zusätzlich wurde ein Handshake-Pin integriert, der in einem Callback sowohl während der Initialisierung (\textit{setup}) als auch nach der Transaktion verwendet wird. Ein High-Signal (1) signalisiert, dass der SPI-Empfänger aufnahmebereit ist, während ein Low-Signal (0) anzeigt, dass sich der Empfänger in der Verarbeitung befindet.
 
@@ -190,15 +190,15 @@ void spi_receive(void *pvParameters)
 \subsection{Task - Decodierung Manchester Signal}
 \label{sub:MvbManchDecode}
 %\textcolor{red}{Hier wird erklärt, wie die Statemachine für die Decodierung des Manchester Encodierten Signals Verwendet wurde. }
-Gemäss Kapitel \ref{sec:HardwareFPGA} werden jeweils acht Nutzdatenbits als 16bit Werten transferiert. Dies um Manchester-Violations zu erkennen, die im Master- und Slave Start-Delimiter vorhanden sind (siehe Kapitel \ref{sub:StartDelimiter}). Die State Machine verarbeitet pro Durchlauf je acht Nutzdatenbits. Bei einer SPI-Transaktion werden jeweils 32 Nutzdatenbits übertragen. Das bedeutet, dass nach einer Übertragung jeweils vier neue Werte in der spi\_queue vorhanden sind, welche bearbeitet werden. 
+Gemäss Kapitel \ref{sec:HardwareFPGA} werden jeweils acht Nutzdatenbits als 16 Bit Werten transferiert. Dies, um Manchester-Violations zu erkennen, die im Master- und Slave Start-Delimiter vorhanden sind (siehe Kapitel \ref{sub:StartDelimiter}). Die Statemachine verarbeitet pro Durchlauf je acht Nutzdatenbits. Bei einer SPI-Transaktion werden jeweils 32 Nutzdatenbits übertragen. Das bedeutet, dass nach einer Übertragung jeweils vier neue Werte in der spi\_queue vorhanden sind, welche bearbeitet werden. 
 
 Zur Zusammensetzung der Telegramme wurde eine Statemachine implementiert, da die Reihenfolge der Telegramme auf dem Datenbus ideal für dieses Konzept ist. Eine grafische Darstellung der Statemachine findet sich im Ablaufdiagramm im Anhang \ref{app:ManchDec}.
 
-Gemäss Kapitel \ref{sub:MasterSlavePrinzip} wird ein Telegamm in zwei Schritten auf dem Bus gesendet. Als Erstes wird ein Master-Frame mit einer gleichbleibenden Länge von 32 Nutzdatenbits versendet. Die Länge des darauffolgenden Slave-Frames variiert zwischen einer Länge von 32 - 296 Nutzdatenbits.
+Gemäss Kapitel \ref{sub:MasterSlavePrinzip} wird ein Telegramm in zwei Schritten auf dem Bus gesendet. Als Erstes wird ein Master-Frame mit einer gleichbleibenden Länge von 32 Nutzdatenbits versendet. Die Länge des darauffolgenden Slave-Frames variiert zwischen einer Länge von 32 - 296 Nutzdatenbits.
 
-Damit der Prozess eines Telegramms gestartet werden kann, muss zuest das Master Start-Delimiter (gemäss Kapitel \ref{sub:StartDelimiter}) erkennt werden. Dies erfolgt anhand der hexadezimalen Repräsentation des Wertes für den Start-Delimiter und lautet 0xC715. Wird ein solcher Wert erkennt, müssen die Daten der nächsten drei Transaktionen den Master-Frame-Daten und der Master-Checksequenz entsprechen.
+Damit der Prozess eines Telegramms gestartet werden kann, muss zuerst das Master Start-Delimiter (gemäss Kapitel \ref{sub:StartDelimiter}) erkannt werden. Dies erfolgt anhand der hexadezimalen Repräsentation des Wertes für den Start-Delimiter und lautet 0xC715. Wird ein solcher Wert erkannt, müssen die Daten der nächsten drei Transaktionen den Master-Frame-Daten und der Master-Checksequenz entsprechen.
 
-Nach dem Master-Frame folgt das Slave-Frame, sofern dieses sendefähig ist und sich angesprochen fühlt. Auf die gleiche Weise wie vorhin wird der empfangende Wert auf seine hexadezimale Repräsentation überprüft. Diese lautet 0xA8E3. Wird diese nicht erkennt, kann dies folgende zwei Gründe haben:
+Nach dem Master-Frame folgt das Slave-Frame, sofern dieses sende-fähig ist und sich angesprochen fühlt. Auf die gleiche Weise wie vorhin wird der empfangende Wert auf seine hexadezimale Repräsentation überprüft. Diese lautet 0xA8E3. Wird diese nicht erkannt, kann dies folgende zwei Gründe haben:
 
 \begin{enumerate}
     \item Anstelle des Slave Start-Delimiters wurde ein Master Start Delimtier geschickt. Dies passiert, wenn der Slave Teilnehmer aktuell nicht bereit zu senden ist. 
@@ -207,7 +207,7 @@ Nach dem Master-Frame folgt das Slave-Frame, sofern dieses sendefähig ist und s
 
 In beiden Fällen wird das aktuelle Telegramm abgebrochen und mit einem entsprechenden Error Code über die ble\_queue (siehe Kapitel \ref{subsub:Queue}) an den Task bt\_send übermittelt. 
 
-Wird der Slave Start-Delimiter erkannt, werden die Slave-Daten und Checksequenzen empfangen. Abbildung \ref{fig:SlaveFrameFormat} zeigt die übertragbaren Nutzdatenbits pro Frame-Grösse. Beispielsweise werden bei einem Frame mit 128 Nutzdatenbits in 8-Bit-Schritten verarbeitet: Zuerst 64 Nutzdatenbits in 8 Zyklen, gefolgt von einer separaten Checksumme. Anschliessend folgen weitere 64 Nutzdatenbits und eine abschliessende Checksumme. Der untenstehende Code zeigt die Implementierung in C. Die Variabel \textit{slave\_data\_loop} in der Zeile 8 und \textit{slave\_check\_loop} in Zeile 29 definieren dabei die Anzahl Zyklen und werden im vorherigen Schritt \textit{Slave Start} gemäss Tabelle \ref{tab:SchlaufenSlaveLoops} gesetzt. 
+Wird der Slave Start-Delimiter erkannt, werden die Slave-Daten und Checksequenzen empfangen. Abbildung \ref{fig:SlaveFrameFormat} zeigt die übertragbaren Nutzdatenbits pro Frame-Grösse. Beispielsweise werden bei einem Frame mit 128 Nutzdatenbits in 8-Bit-Schritten verarbeitet: Zuerst 64 Nutzdatenbits in 8 Zyklen, gefolgt von einer separaten Checksumme. Anschliessend folgen weitere 64 Nutzdatenbits und eine abschliessende Checksumme. Der untenstehende Code zeigt die Implementierung in C. Die Variable \textit{slave\_data\_loop} in der Zeile 8 und \textit{slave\_check\_loop} in Zeile 29 definieren dabei die Anzahl Zyklen und werden im vorherigen Schritt \textit{Slave Start} gemäss Tabelle \ref{tab:SchlaufenSlaveLoops} gesetzt. 
 
 Ist die Bedingung in Zeile 29 \textit{false} wird der aktuelle Pointer auf das Telegramm über die ble\_queue dem Task bt\_send übergeben. 
 
@@ -282,7 +282,7 @@ case Slave_check:
 \end{table}
 
 
-Zusammenfassend beschreibt dieses Kapitel die Implementierung einer State Machine zur effizienten Verarbeitung von Telegrammen, die auf dem Datenbus nach festgelegten Regeln übertragen werden. Durch die klare Trennung von Master- und Slave-Frames sowie die schrittweise Verarbeitung der Daten und Checksummen wird sichergestellt, dass die Integrität der Telegramme gewahrt bleibt. Fehlerfälle werden erkannt und entsprechend gehandhabt, während die Daten zuverlässig über die \textit{ble\_queue} weitergeleitet werden.
+Zusammenfassend beschreibt dieses Kapitel die Implementierung einer Statemachine zur effizienten Verarbeitung von Telegrammen, die auf dem Datenbus nach festgelegten Regeln übertragen werden. Durch die klare Trennung von Master- und Slave-Frames sowie die schrittweise Verarbeitung der Daten und Checksummen wird sichergestellt, dass die Integrität der Telegramme gewahrt bleibt. Fehlerfälle werden erkannt und entsprechend gehandhabt, während die Daten zuverlässig über die \textit{ble\_queue} weitergeleitet werden.
 
 
 \subsection{Task Bluetooth Senden}
@@ -304,33 +304,45 @@ Der Task \textit{Bluetooth Senden} übernimmt die Aufgabe, Daten aus der \textit
     Nach Abschluss der Übertragung wird der Buffer auf Null gesetzt, um für die nächste Nutzung vorbereitet zu sein.
 \end{enumerate}
 
-Dieser Task nutzt die Mechanismen von FreeRTOS und die Funktionen des BLE-Stacks, um die Datenübertragung durchzuführen.
+Dieser Task nutzt die Mechanismen von FreeRTOS und die Funktionen des BLE-Stacks, um die Datenübertragung durchzuführen. Der Host-Driver muss vorab konfiguriert werden. Der Code dafür wurde aus einem Codebeispiel von der ESP-IDF kopiert und gemäss dem eigenen Nutzen angepasst. \cite{BLUETOOTH_EXAMPLE_GATT}
 
 
 
 \subsection{Bluetooth GATT-Server}
 \label{sub:BluetoothGATT}
 %\textcolor{red}{Wie wurde der Bluetooth Gatt-Server aufgebaut. Erklärung Charakteristiken}
-Auf dem ESP32-S3 stehen zwei Bluetooth Low Energy Host Systeme zur Verfügung. Der BluFi-Host sowie der NimBle-Host\cite{BLUETOOTH_API}. Für dieses Projekt wurde der NimBle-Host verwendet, da es gut dokumentiert ist und Beispielcode zur Verfügung stehen.
+Auf dem ESP32-S3 stehen zwei Bluetooth Low Energy Host Systeme zur Verfügung. Der BluFi-Host sowie der NimBle-Host\cite{BLUETOOTH_API}. Für dieses Projekt wurde der NimBle-Host verwendet, da es gut dokumentiert ist und Beispielcode zur Verfügung steht.
 
-In Abbildung \ref{fig:BLEGATT} ist eine grafische Darstellung des Generic Attrubute Profile (GATT) Servers zu sehen.
+In Abbildung \ref{fig:BLEGATT} ist eine grafische Darstellung des Generic Attribute Profile (GATT) Servers zu sehen.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Figures/Chap3/ESP/BLE/BLE.png}
-    \caption{Bluetooth GATT Server auf ESP32S3}
+    \caption{Bluetooth GATT Server auf ESP3-S3}
     \label{fig:BLEGATT}
 \end{figure}
 
 \subsubsection{Service - Device Info}
-Der Service \textit{0x180A} zur \textit{Device Info} stellt dabei grundlegend statische Werte zur Verfügung, welche die Identifikation des Gerätes mit \textit{0x2A24 Model Number}, oder die Aktualität der Firmware \textit{0x2A26 Firmware Revision} nach aussen zur Verfügung stellen. Die atkuellen Werte sind Beispielwerte und werden sich zu einem späteren Zeitpunkt ändern. 
+Der Service \textit{0x180A} zur \textit{Device Info} stellt dabei grundlegend statische Werte zur Verfügung, welche die Identifikation des Gerätes mit \textit{0x2A24 Model Number} oder die Aktualität der Firmware \textit{0x2A26 Firmware Revision} nach aussen zur Verfügung stellen. Die aktuellen Werte sind Beispielwerte und werden sich zu einem späteren Zeitpunkt ändern. 
 
 \subsubsection{Service - Sniffer}
 Der zweite Service stellt keine vordefinierte 16bit UUID zur Verfügung. Daher wurde diese Service-UUID mithilfe eines \textit{Online UUID Generator} generiert. In Abbildung \ref{fig:BLEGATT} ist die Zahl an 8. Stelle rot markiert. Dies soll darauf hinweisen, dass diese Zahl für die Charakteristiken inkrementiert wurde. Der selbstdefinierte Service soll den Datenaustausch zwischen Sniffer und Endgerät handeln. 
 
 Die Charakteristik mit der roten Zahl 1 soll dabei die empfangenen Telegramme nach aussen schicken. Der erwartete Data-Throughput ist gemäss Kapitel \ref{tab:Busauslastung} bei Übertragung des gesamten MVB-Traffics hoch. Aus diesem Grund ist die \textit{Propertie} dieser Charakteristik auf \textbf{Notify} gesetzt.
 
-Die Charakteristik mit der roten Zahl 2 soll ein individualisierbares Befehlsset schicken können, womit der Sniffer gesteuert, beziehungsweise dessen Verhalten geändert werden kann. Beispiele dazu sind Einstellung eines Filters oder Abfrage von Parametern (siehe dazu Kapitel \ref{sec:AusblickFirmwareESP32}). Weil die Befehle auf den Sniffer geschrieben werden, ist die \textit{Propiertie} in diesem Fall \textbf{Write}.
+Die Charakteristik mit der roten Zahl 2 soll ein individualisierbares Befehlsset schicken können, womit der Sniffer gesteuert, beziehungsweise dessen Verhalten geändert werden kann. Beispiele dazu sind die Einstellung eines Filters oder die Abfrage von Parametern (siehe dazu Kapitel \ref{sec:AusblickFirmwareESP32}). Weil die Befehle auf den Sniffer geschrieben werden, ist die \textit{Propiertie} in diesem Fall \textbf{Write}.
 
-Die Charakteristik mit der roten Zahl 3 soll die Befehle, welche mit der vorherigen Charakteristik geschickt worden sind, mit einer OK-Message bestätigen oder einen Payload haben. Die \textit{Propiertie} ist auf \textbf{Indicate} gesetzt, sodass der Sniffer eine Rückmeldung schickt, sobald er diese bereit hat. Im Falle eines Timeouts kann das Endgerät auch einen \textbf{Read} auf die Charakteristik machen
+Die Charakteristik mit der roten Zahl 3 soll die Befehle, welche mit der vorherigen Charakteristik geschickt worden sind, mit einer OK-Message bestätigen oder einen Payload haben. Die \textit{Propiertie} ist auf \textbf{Indicate} gesetzt, sodass der Sniffer eine Rückmeldung schickt, sobald er diese bereit hat. Im Falle eines Timeouts kann das Endgerät auch einen \textbf{Read} auf die Charakteristik machen.
 
+
+
+\subsection{Datenablage Code}
+\label{sub:DatenablageCodeESP32S3}
+Das gesamte Projektfile ist im Anhang \ref{app:Ordner41} beigefügt worden. Im Ordner "main" sind 3 Files ersichtlich, die hier kurz erläutert werden.
+\begin{itemize}
+    \item \textbf{Sniffer\_FW.c}: Das main() File mit dem Einstiegspunkt in der Funktion \textit{app\_main()}.
+    \item \textbf{gatt\_svr.c}: Der selbst erstellte GATT-Server gemäss Kapitel \ref{sub:BluetoothGATT}.
+    \item \textbf{gatt\_svr.h}: Das Header File zu gatt\_svr.c
+\end{itemize}
+
+Das File "'sdkconfig"' entspricht der aktuellen Konfiguration des Projektes. Dort sind beispielsweise die NimBle-Einstellungen ersichtlich und können geändert werden. 

@@ -8,7 +8,7 @@
 \section{Hardware FPGA}
 \label{sec:HardwareFPGA}
 Das FPGA soll die Umwandlung des Manchestersignals vom MVB, bzw. des Signals
-nach dem RS485 Transceiver, in einen Bitstream realisieren. 
+nach dem RS485-Transceiver, in einen Bitstream realisieren. 
 
 Die Konfiguration für das FPGA wurde in der Hardwarebeschreibungssprache VHDL geschrieben. Dabei wurden
 mehrere Dateien für die verschiedenen Aufgaben des FPGA erstellt, um eine saubere und simple 
@@ -16,10 +16,10 @@ Dateistruktur zu erreichen. Der Code wurde mittels der Designsoftware Quartus ge
 synthetisiert und auf das FPGA geladen.
 
 Der Code ist in fünf Dateien aufgeteilt. Zwar wurde dieser in seine verschiedenen Aufgaben, der
-Decodierung des Signals (siehe Kapitel \ref{Manchester Decodierung}), der Ausgabe des Bitstream auf SPI
-(siehe Kapitel \ref{fpga:spi}), der Erzeugung der Taktfrequenz für die Abtastung des Manchestersignal,
-dem Puffern der Werte nach der Abtastung (siehe Kapitel \ref{fpga:spi}) und zuletzt wurde eine Top-Level Datei erstellt um all diese
-Prozesse zu verknüpfen und die Ein- und Ausgänge des FPGA zu konfigurieren. Der zugehörige Code ist in Anhang \ref{app:File31} zu finden.
+Decodierung des Signals (siehe Kapitel \ref{Manchester Decodierung}), der Ausgabe des Bitstreams auf SPI
+(siehe Kapitel \ref{fpga:spi}), der Erzeugung der Taktfrequenz für die Abtastung des Manchestersignals,
+dem Puffern der Werte nach der Abtastung (siehe Kapitel \ref{fpga:spi}) und zuletzt wurde eine Top-Level-Datei erstellt, um all diese
+Prozesse zu verknüpfen und die Ein- und Ausgänge des FPGA zu konfigurieren. Der zugehörige Code ist im Anhang \ref{app:File31} zu finden.
 
 In Abbildung \ref{fig:AufbauFPGA} sind graphisch in Blockschaltbildern die Verknüpfungen der Dateien zu sehen.
 
@@ -32,7 +32,7 @@ In Abbildung \ref{fig:AufbauFPGA} sind graphisch in Blockschaltbildern die Verkn
 
 In den folgenden Unterkapiteln werden die einzelnen wichtigsten Prozesse genauer erklärt.\\
 \\
-Dabei ist wichtig zu erwähnen, dass durch die Decodierung des Manchestersignal, aus einem Bit
+Dabei ist wichtig zu erwähnen, dass durch die Decodierung des Manchestersignals, aus einem Bit
 (Manchester-Codiert) zwei Bit (Bitstream) werden. Das heisst im 16 Bit grossen 
 \textit{data\_value\_reg} ist jeweils ein Byte des MVB abgebildet.\\
 \newline
@@ -44,16 +44,16 @@ In dieser Arbeit gelten folgende Einheitsnamen und Datengrössen:\\
 \label{Manchester Decodierung}
 
 Um das Manchestersignal decodieren zu können, muss dieses abgetastet werden. Um möglichst synchron zum
-Signal vom MVB zu sein muss die Abtastfrequenz ein Mehrfaches der MVB Bitrate sein. Um die Abtastung möglichst
-robust zu machen und Fehler zu vermeiden wurde festgelegt minimal vier mal pro Flanke abzutasten. Somit
-wird verhindert dass durch ungewolltes shiften und bei einer Abtastung genau auf dem Flankenwechsel, falsche Werte
+Signal vom MVB zu sein, muss die Abtastfrequenz ein Mehrfaches der MVB Bitrate sein. Um die Abtastung möglichst
+robust zu machen und Fehler zu vermeiden, wurde festgelegt, minimal viermal pro Flanke abzutasten. Somit
+wird verhindert, dass durch ungewolltes Shiften und bei einer Abtastung genau auf dem Flankenwechsel, falsche Werte
 decodiert werden.
-Bei einer Abtastung von vier mal pro Flanke und somit acht mal pro BT (666 ns = 1.5 MHz) ergibt sich eine Abtastfrequenz von 12 MHz.
+Bei einer Abtastung von viermal pro Flanke und somit achtmal pro BT (666 ns = 1.5 MHz) ergibt sich eine Abtastfrequenz von 12 MHz.
 Um diese Abtastrate zu realisieren, wurde mit der Designsoftware Quartus eine Taktfrequenz von 12 MHz generiert.
 Die abgetasteten Werte werden fortlaufend in ein acht Bit grosses Register \textit{reg\_sample} geschrieben.
 In Abbildung \ref{fig:MasterframeAbtastung} ist das Master Start-Delimiter mit den
 jeweiligen Abtastpunkten in blau, den Abtastwerten im Register \textit{reg\_sample} von Bit 0 - 7 und den darauffolgenden decodierten 
-Werte, welche ins 16 Bit grosse Register \textit{data\_value\_reg} geschrieben werden, zu sehen.
+Werten, welche ins 16 Bit grosse Register \textit{data\_value\_reg} geschrieben werden, zu sehen.
 %Immer nach acht Zyklen werden die Daten in diesem Register ausgewertet.
 
 \begin{figure}[H]
@@ -65,8 +65,8 @@ Werte, welche ins 16 Bit grosse Register \textit{data\_value\_reg} geschrieben w
 
 \subsubsection{Auswertung Manchestersignal}
 \label{Auswertung Manchestersignal}
-Immer zu Beginn eines Frame (Master wie auch Slave) wird der Start mit einem Startbit signalisiert, wie dies bereits in Kapitel \ref{sub:StartDelimiter} beschrieben ist.
-Sobald das \textit{Start bit} im Auswerteprozess erkannt wird, heisst sobald Bit 5 - 2 im Register \textit{reg\_sample} den Wert \textit{"'1100"'} haben, wechselt das FPGA vom Zustand \textit{IDLE} in den Zustand \textit{RECEIVING}. Dieser Zustandswechsel ist in Abbildung \ref{fig:FPGAIdleRec} dargestellt.
+Immer zu Beginn eines Frames (Master wie auch Slave) wird der Start mit einem Startbit signalisiert, wie dies bereits in Kapitel \ref{sub:StartDelimiter} beschrieben ist.
+Sobald das \textit{Start bit} im Auswerteprozess erkannt wird, heisst es, sobald Bit 5 - 2 im Register \textit{reg\_sample} den Wert \textit{"'1100"'} haben, wechselt das FPGA vom Zustand \textit{IDLE} in den Zustand \textit{RECEIVING}. Dieser Zustandswechsel ist in Abbildung \ref{fig:FPGAIdleRec} dargestellt.
 
 \begin{figure}[H]
     \centering
@@ -75,8 +75,8 @@ Sobald das \textit{Start bit} im Auswerteprozess erkannt wird, heisst sobald Bit
     \label{fig:FPGAIdleRec}
 \end{figure}
 
-Im Zustand \textit{RECEIVING} werden Fortlaufend die abgetasteten Werte ins Register 
-\textit{reg\_sample} geschrieben und immer nachdem acht mal abgetastet wurde, werden die Daten in diesem Register ausgewertet. Dabei ist im Idealfall immer ein ganzes BT des MVB-Signal im Register abgebildet, was einem Nutzdatenbit entspricht. Idealerweise ist dann auch der Übergang der Flanke von "'0"' auf "'1"' oder von "'1"' auf "'0"' genau bei Bit 4 auf 3 zu sehen. Die Auswertelogik überprüft dann jeweils was an den Stellen 5 - 2 des Registers steht und schreibt dementsprechend die Werte weiter ins Register \textit{data\_value\_reg}. Im Idealfall gibt es dann genau vier Fälle die entstehen können.
+Im Zustand \textit{RECEIVING} werden fortlaufend die abgetasteten Werte ins Register 
+\textit{reg\_sample} geschrieben und immer nachdem achtmal abgetastet wurde, werden die Daten in diesem Register ausgewertet. Dabei ist im Idealfall immer ein ganzes BT des MVB-Signals im Register abgebildet, was einem Nutzdatenbit entspricht. Idealerweise ist dann auch der Übergang der Flanke von "'0"' auf "'1"' oder von "'1"' auf "'0"' genau bei Bit 4 auf 3 zu sehen. Die Auswertelogik überprüft dann jeweils, was an den Stellen 5 - 2 des Registers steht und schreibt dementsprechend die Werte weiter ins Register \textit{data\_value\_reg}. Im Idealfall gibt es dann genau vier Fälle, die entstehen können.
 
 
 % Das sind die folgenden vier:
@@ -93,13 +93,12 @@ Im Zustand \textit{RECEIVING} werden Fortlaufend die abgetasteten Werte ins Regi
 % \textbf{Fall 4}\\
 % Im vierten Fall wird die zweite violation erkannt. Wenn das Register die Werte \textit{"'11111111"'} beinhaltet wird ins \textit{data\_value\_reg} der Wert "'11"' geschrieben.
 
-Da der Abtasttakt nicht synchron mit dem MVB-Takt läuft kann es zu leichten Abweichungen kommen, was dazu führt dass der Flankenwechsel nicht bei Bit 4 auf
-3 sondern bei Bit 3 auf 2 oder bei Bit 5 auf 4 zu sehen ist. Um diese weiteren Fälle abzufangen, werden jeweils nicht nur die 
+Da der Abtasttakt nicht synchron mit dem MVB-Takt läuft, kann es zu leichten Abweichungen kommen, was dazu führt, dass der Flankenwechsel nicht bei Bit 4 auf 3, sondern bei Bit 3 auf 2 oder bei Bit 5 auf 4 zu sehen ist. Um diese weiteren Fälle abzufangen, werden jeweils nicht nur die 
 mittleren zwei Bit auf ihre Werte überprüft, sondern gleich die mittleren vier Bit. Somit überprüft der Auswerteprozess das Register nicht nur auf vier, sondern auf acht Fälle.
 
-Da das Register \textit{data\_value\_reg} 16 Werte beinhaltet würde es noch weitere acht Fälle
-geben. Das Eintreffen der weiteren Acht Fälle wird durch ein shiften der Bit, wenn das Signal über
-drei Auswertezyklen hinweg nicht synchron läuft, verhindert. Somit muss die Auswertelogik Acht
+Da das Register \textit{data\_value\_reg} 16 Werte beinhaltet, würde es noch weitere acht Fälle
+geben. Das Eintreffen der weiteren acht Fälle wird durch ein Shiften der Bits, wenn das Signal über
+drei Auswertezyklen hinweg nicht synchron läuft, verhindert. Somit muss die Auswertelogik acht  
 Fälle implementiert haben und diese korrekt abarbeiten.
 
 In Abbildung \ref{fig:FPGAreg_sampleCases} sind alle 16 möglichen Fälle zu 
@@ -118,11 +117,11 @@ In Abbildung \ref{fig:FPGAreg_sampleCases} ist zu sehen, dass bei den ersten vie
 Fällen genau ein ganzes Nutzdatenbyte im Register abgebildet ist und somit der 
 Flankenwechsel bei Bit 4 auf Bit 3 zu sehen ist. In diesen Fällen ist kein 
 nachträgliches Shifting nötig und der Wert, welcher in der letzten Spalte zu
-sehen ist wird ins \textit{data\_value\_reg} Register geschrieben.
+sehen ist, wird ins \textit{data\_value\_reg} Register geschrieben.
 
 In den Fällen fünf bis acht sind die Werte jeweils um ein Bit verschoben, wodurch
 der Flankenwechsel bei Bit 3 auf 2 (Fall 5 \& 6) oder bei Bit 5 auf 4
-(Fall 7 \& 8) statt findet. Diese Fälle werden erkannt und die jeweiligen Werte, wie
+(Fall 7 \& 8) stattfindet. Diese Fälle werden erkannt und die jeweiligen Werte, wie
 sie in der letzten Spalte zu sehen sind, ins Register \textit{data\_value\_reg} 
 geschrieben.\\
 In diesen Fällen notwendig. Dieser Prozess wird in Kapitel \ref{Shifting-Prozess}
@@ -130,7 +129,7 @@ erläutert.
 
 In den Fällen neun bis 16 sind die Werte um zwei oder um drei Bit verschoben. Diese Fälle würden dann auftreten, wenn sich das MVB-Signal innerhalb von acht
 Abtastungen um zwei ganze Abtastwerte verschiebt. Dies entspricht einer
-Verschiebung um 25 \%. In der Norm IEC 61375-3-1 ist festgehalten dass eine maximale Abweichung zur Taktfrequenz 1.5 MHz um 0.01 \% vorkommen kann. \cite{MVB_Norm}\\
+Verschiebung um 25 \%. In der Norm IEC 61375-3-1 ist festgehalten, dass eine maximale Abweichung zur Taktfrequenz 1.5 MHz um 0.01 \% vorkommen kann (siehe Kapitel \ref{sub:GeschwindigkeitDatenbus}).\\
 Daher werden die Fälle 9 bis 16 nie erreicht und müssen nicht in der Auswertelogik
 implementiert sein.
  
